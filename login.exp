@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout -1
+spawn gh auth login -h github.com -p https -w
+expect "Authenticate Git with your GitHub credentials?"
+send "y\r"
+expect -re "\[A-Z0-9]{4}-\[A-Z0-9]{4}"
+set code $expect_out(0,string)
+puts "\n=== START_SYSTEM_MESSAGE ==="
+puts "DEVICE_CODE: $code"
+puts "=== END_SYSTEM_MESSAGE ===\n"
+expect "Authentication complete"
+puts "Success!"
