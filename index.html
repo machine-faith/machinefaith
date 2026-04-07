@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Machine Faith | Website Management for Sydney Small Business</title>
+<meta name="description" content="Machine Faith provides professional website management, SEO, and digital strategy for Sydney small businesses. $149/month. No lock-in contracts. Talk to a real person."/>
+<!-- Open Graph -->
+<meta property="og:title" content="Machine Faith | Website Management for Sydney Small Business"/>
+<meta property="og:description" content="Professional website management from $149/month. Hosting on enterprise-grade infrastructure. Local Sydney support."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://machine-faith.github.io/machinefaith/"/>
+<!-- Structured Data for AI Search (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Machine Faith",
+  "description": "Website management and digital strategy for Sydney small businesses.",
+  "url": "https://machine-faith.github.io/machinefaith/",
+  "areaServed": {
+    "@type": "City",
+    "name": "Sydney"
+  },
+  "priceRange": "$$",
+  "serviceType": ["Website Management", "SEO", "Digital Strategy"]
+}
+</script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+  }
+  h1, h2, h3, .font-serif {
+    font-family: 'Noto Serif', serif;
+  }
+  #mobile-menu { display: none; }
+  #mobile-menu.open { display: flex; }
+  .pricing-highlight {
+    background: linear-gradient(135deg, #162839 0%, #2c3e50 100%);
+  }
+</style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#fafaf5",
+          "on-primary": "#ffffff",
+          "secondary-container": "#cbe7f5",
+          "on-secondary-fixed": "#021f29",
+          "secondary-fixed-dim": "#afcbd8",
+          "primary": "#162839",
+          "surface-container-highest": "#e3e3de",
+          "surface-container": "#eeeee9",
+          "surface": "#fafaf5",
+          "surface-container-high": "#e8e8e3",
+          "on-surface": "#1a1c19",
+          "outline": "#74777d",
+          "on-tertiary-container": "#94aab5",
+          "inverse-surface": "#2f312e",
+          "primary-fixed-dim": "#b5c8df",
+          "surface-container-low": "#f4f4ef",
+          "surface-variant": "#e3e3de",
+          "on-background": "#1a1c19",
+          "tertiary-fixed-dim": "#b4cad6",
+          "primary-container": "#2c3e50",
+          "on-secondary-fixed-variant": "#304a55",
+          "on-surface-variant": "#43474c",
+          "on-secondary-container": "#4e6874",
+          "secondary": "#48626e",
+          "tertiary-fixed": "#cfe6f2",
+          "outline-variant": "#c4c6cd",
+          "surface-dim": "#dadad5",
+          "secondary-fixed": "#cbe7f5",
+          "surface-container-lowest": "#ffffff"
+        },
+        fontFamily: {
+          "headline": ["Noto Serif"],
+          "body": ["Inter"],
+          "label": ["Inter"]
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="bg-background text-on-surface antialiased">
+
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 bg-[#fafaf5]/90 backdrop-blur-md border-b border-outline-variant/20">
+  <nav class="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-7xl mx-auto">
+    <a href="#" aria-label="Machine Faith Home">
+      <img alt="Machine Faith" class="h-8 w-auto object-contain" src="images/logo.png"/>
+    </a>
+    <div class="hidden md:flex gap-8 items-center">
+      <a class="text-[#2C3E50] font-medium hover:text-[#162839] transition-colors duration-300" href="#services">Services</a>
+      <a class="text-[#2C3E50] font-medium hover:text-[#162839] transition-colors duration-300" href="#infrastructure">Infrastructure</a>
+      <a class="text-[#2C3E50] font-medium hover:text-[#162839] transition-colors duration-300" href="#pricing">Pricing</a>
+      <a class="text-[#2C3E50] font-medium hover:text-[#162839] transition-colors duration-300" href="#contact">Contact</a>
+      <a href="#contact" id="nav-quote-btn" class="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-all shadow-sm">Get Started</a>
+    </div>
+    <button id="mobile-toggle" class="md:hidden text-primary" aria-label="Toggle menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </nav>
+  <div id="mobile-menu" class="flex-col gap-2 px-6 pb-4 md:hidden bg-[#fafaf5] border-t border-outline-variant/20">
+    <a class="text-[#2C3E50] font-medium py-2 block" href="#services">Services</a>
+    <a class="text-[#2C3E50] font-medium py-2 block" href="#infrastructure">Infrastructure</a>
+    <a class="text-[#2C3E50] font-medium py-2 block" href="#pricing">Pricing</a>
+    <a class="text-[#2C3E50] font-medium py-2 block" href="#contact">Contact</a>
+    <a href="#contact" class="bg-primary text-on-primary px-6 py-3 rounded-lg font-medium text-center block mt-2">Get Started</a>
+  </div>
+</header>
+
+<main>
+  <!-- Hero Section -->
+  <section class="relative pt-16 pb-28 px-6 md:px-8 overflow-hidden" aria-label="Introduction">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-12 items-center">
+      <div class="md:col-span-7 z-10">
+        <span class="inline-block py-1 px-3 bg-secondary-container text-on-secondary-fixed text-sm font-semibold rounded-full mb-6 uppercase tracking-wider">Sydney-Based · Est. 2025</span>
+        <h1 class="text-5xl md:text-7xl font-bold text-primary mb-8 leading-tight">Website Management for Small Business Owners</h1>
+        <p class="text-xl md:text-2xl text-on-surface-variant leading-relaxed mb-6 max-w-2xl">
+          Machine Faith handles your entire online presence — from hosting and security to SEO and updates — so you can stay focused on running your business.
+        </p>
+        <p class="text-base text-on-surface-variant mb-10 max-w-xl">
+          Your website is managed by a real person, deployed on enterprise-grade infrastructure, and backed by a straightforward monthly plan. No surprises. No technical jargon.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#contact" id="hero-cta-btn" class="bg-primary text-on-primary px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:translate-y-[-2px] transition-transform">Discuss Your Website</a>
+          <a href="#pricing" class="bg-surface-container-high text-primary px-8 py-4 rounded-xl text-lg font-semibold hover:bg-surface-container-highest transition-colors">View Pricing</a>
+        </div>
+      </div>
+      <div class="md:col-span-5 relative">
+        <div class="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700 bg-surface-container-low">
+          <img
+            alt="A clean, modern workspace with a laptop, notebook and coffee — representing the focused, human approach of Machine Faith"
+            class="w-full h-full object-cover"
+            src="images/hero_workspace.png"
+          />
+        </div>
+        <!-- Credibility tag -->
+        <div class="absolute -bottom-6 -left-6 bg-primary p-6 rounded-2xl shadow-xl max-w-[220px]">
+          <p class="text-on-primary text-sm font-semibold mb-1 uppercase tracking-wider">Infrastructure</p>
+          <p class="font-serif text-base leading-snug text-on-primary/90">Deployed on Vercel's global Edge Network — the same platform used by Airbnb and Under Armour.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="py-24 px-6 md:px-8 bg-surface-container-low" id="services" aria-label="Services">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-16">
+        <h2 class="text-4xl font-bold text-primary mb-4">What's Included</h2>
+        <p class="text-lg text-on-surface-variant max-w-xl">A managed service covering everything your website needs — handled proactively, not reactively.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Website Management -->
+        <div class="md:col-span-2 bg-surface p-10 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-10 items-start">
+          <div class="flex-1">
+            <div class="w-14 h-14 bg-primary/5 flex items-center justify-center rounded-xl mb-6">
+              <span class="material-symbols-outlined text-primary text-2xl">desktop_windows</span>
+            </div>
+            <h3 class="text-2xl font-bold text-primary mb-4">Website Management & Maintenance</h3>
+            <p class="text-on-surface-variant leading-relaxed mb-6">
+              Ongoing management of your website's performance, uptime, and content. Updates are handled promptly. Your site stays current, fast, and functional — without you needing to get involved.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary mt-0.5 flex-shrink-0" style="font-size:1.1rem">check_circle</span>
+                <span>Routine content and copy updates</span>
+              </li>
+              <li class="flex items-start gap-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary mt-0.5 flex-shrink-0" style="font-size:1.1rem">check_circle</span>
+                <span>24/7 uptime monitoring with instant alerts</span>
+              </li>
+              <li class="flex items-start gap-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary mt-0.5 flex-shrink-0" style="font-size:1.1rem">check_circle</span>
+                <span>Domain and DNS management</span>
+              </li>
+              <li class="flex items-start gap-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary mt-0.5 flex-shrink-0" style="font-size:1.1rem">check_circle</span>
+                <span>Automatic SSL certificate renewal</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- SEO & GEO -->
+        <div class="bg-surface-container-highest p-10 rounded-[2rem] shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-primary/5 flex items-center justify-center rounded-xl mb-6">
+              <span class="material-symbols-outlined text-primary text-2xl">travel_explore</span>
+            </div>
+            <h3 class="text-2xl font-bold text-primary mb-4">SEO & AI Search Visibility</h3>
+            <p class="text-on-surface-variant leading-relaxed">
+              Structured to rank in traditional search engines <em>and</em> AI-powered answer tools like ChatGPT, Google's AI Overview, and Perplexity. Schema markup, semantic HTML, and optimised metadata are built into every site we manage.
+            </p>
+            <ul class="mt-6 space-y-2 text-sm text-on-surface-variant">
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-primary flex-shrink-0" style="font-size:1rem">check</span>
+                <span>Local SEO optimisation for Sydney searches</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-primary flex-shrink-0" style="font-size:1rem">check</span>
+                <span>JSON-LD structured data (GEO-ready)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-primary flex-shrink-0" style="font-size:1rem">check</span>
+                <span>Core Web Vitals &amp; performance audits</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Digital Strategy -->
+        <div class="bg-secondary-fixed p-10 rounded-[2rem] shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="w-14 h-14 bg-white/40 flex items-center justify-center rounded-xl mb-6">
+              <span class="material-symbols-outlined text-on-secondary-fixed text-2xl">bar_chart_4_bars</span>
+            </div>
+            <h3 class="text-2xl font-bold text-on-secondary-fixed mb-4">Digital Strategy & Add-ons</h3>
+            <p class="text-on-secondary-fixed opacity-80 leading-relaxed">
+              Beyond maintenance, we work with you to improve your online results. From landing page improvements to conversion rate analysis, add-ons are available on request at transparent rates.
+            </p>
+          </div>
+          <div class="mt-10 text-on-secondary-fixed font-semibold flex items-center gap-2 group cursor-pointer">
+            <a href="#contact" class="flex items-center gap-2 text-on-secondary-fixed">
+              Enquire about add-ons <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Statement card -->
+        <div class="md:col-span-2 bg-primary p-12 rounded-[2rem] text-on-primary flex flex-col md:flex-row items-center gap-8">
+          <div class="flex-1">
+            <h3 class="text-3xl font-serif mb-4 italic">One point of contact. Straightforward communication.</h3>
+            <p class="text-on-primary/80 text-lg">Every client works directly with the same person. No account managers, no ticketing systems, no outsourcing.</p>
+          </div>
+          <a href="#contact" class="bg-white text-primary px-8 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all whitespace-nowrap flex-shrink-0">Start a Conversation</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Infrastructure Section -->
+  <section class="py-24 px-6 md:px-8" id="infrastructure" aria-label="Security and Infrastructure">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-16 max-w-2xl">
+        <h2 class="text-4xl font-bold text-primary mb-4">Enterprise Infrastructure, Without the Enterprise Cost</h2>
+        <p class="text-lg text-on-surface-variant">Every website managed by Machine Faith is deployed on the same infrastructure used by global companies — configured and maintained on your behalf.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">hub</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">Vercel Edge Network</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Sites are served from Vercel's global Content Delivery Network (CDN), with Points of Presence (PoPs) across 6 continents. Pages load from the server closest to your visitor — typically under 100ms.</p>
+        </div>
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">lock</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">TLS 1.3 Encryption</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">All sites run on HTTPS with TLS 1.3 certificates provisioned via Let's Encrypt and managed automatically. Certificate rotation and renewal is handled without any manual intervention.</p>
+        </div>
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">shield</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">DDoS Mitigation</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Vercel's infrastructure includes built-in Distributed Denial-of-Service (DDoS) protection at the network layer. Malicious traffic is automatically absorbed and routed away before it affects your site.</p>
+        </div>
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">rocket_launch</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">Serverless Deployment</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Static and serverless architecture eliminates the attack surface of traditional CMS platforms. No database to breach, no admin panel to compromise, no plugin vulnerabilities to patch.</p>
+        </div>
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">commit</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">CI/CD via GitHub Actions</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Every update is version-controlled and deployed through a Continuous Integration / Continuous Deployment (CI/CD) pipeline. Changes are reviewed, tested, and rolled back instantly if anything goes wrong.</p>
+        </div>
+
+        <div class="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/30">
+          <div class="w-12 h-12 bg-primary/5 flex items-center justify-center rounded-xl mb-5">
+            <span class="material-symbols-outlined text-primary">speed</span>
+          </div>
+          <h4 class="text-lg font-bold text-primary mb-2">Core Web Vitals Optimised</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Sites are built to pass Google's Core Web Vitals: Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS), and Interaction to Next Paint (INP) — all direct ranking signals.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Machine Faith Section -->
+  <section class="py-24 px-6 md:px-8 bg-surface-container-low" id="approach" aria-label="Our Approach">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+      <div>
+        <h2 class="text-4xl font-bold text-primary mb-4 leading-tight">Why Work With Machine Faith?</h2>
+        <p class="text-on-surface-variant text-lg mb-12 leading-relaxed">Most web agencies are built around projects — they build your site and move on. Machine Faith is built around ongoing relationships with businesses that want consistent, professional support.</p>
+        <div class="space-y-10">
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-secondary-container flex items-center justify-center rounded-full text-primary font-bold text-lg">1</div>
+            <div>
+              <h4 class="text-xl font-bold mb-2 text-primary">Direct Access</h4>
+              <p class="text-on-surface-variant leading-relaxed">You deal directly with one person, not a support queue. Response times are measured in hours, not business days.</p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-secondary-container flex items-center justify-center rounded-full text-primary font-bold text-lg">2</div>
+            <div>
+              <h4 class="text-xl font-bold mb-2 text-primary">Sydney-Based</h4>
+              <p class="text-on-surface-variant leading-relaxed">Operating from Sydney, in your timezone. Meetings in person or over video — whichever suits you.</p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-secondary-container flex items-center justify-center rounded-full text-primary font-bold text-lg">3</div>
+            <div>
+              <h4 class="text-xl font-bold mb-2 text-primary">Transparent Reporting</h4>
+              <p class="text-on-surface-variant leading-relaxed">Monthly updates on your site's performance, traffic, and any work completed. No black boxes, no vague invoices.</p>
+            </div>
+          </div>
+          <div class="flex gap-6">
+            <div class="flex-shrink-0 w-12 h-12 bg-secondary-container flex items-center justify-center rounded-full text-primary font-bold text-lg">4</div>
+            <div>
+              <h4 class="text-xl font-bold mb-2 text-primary">No Technical Background Required</h4>
+              <p class="text-on-surface-variant leading-relaxed">Everything is explained clearly. You retain full ownership of your domain and website at all times.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-4 pt-12">
+          <div class="aspect-square rounded-3xl overflow-hidden shadow-md bg-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary opacity-20" style="font-size:7rem">location_city</span>
+          </div>
+          <div class="aspect-video rounded-3xl overflow-hidden shadow-md bg-secondary-fixed"></div>
+        </div>
+        <div class="space-y-4">
+          <div class="aspect-video rounded-3xl overflow-hidden shadow-md bg-primary-container"></div>
+          <div class="aspect-square rounded-3xl overflow-hidden shadow-md bg-surface-container-high flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary opacity-20" style="font-size:7rem">handshake</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="py-24 px-6 md:px-8" id="pricing" aria-label="Pricing">
+    <div class="max-w-5xl mx-auto text-center mb-16">
+      <h2 class="text-4xl font-bold text-primary mb-4">Straightforward Pricing</h2>
+      <p class="text-lg text-on-surface-variant max-w-2xl mx-auto">One plan, clearly priced. No hidden fees, no annual lock-in, and no bill surprises. The website is provided at no upfront cost — you pay for ongoing management.</p>
+    </div>
+    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-stretch">
+
+      <!-- Main plan -->
+      <div class="pricing-highlight text-on-primary rounded-[2rem] p-10 flex flex-col">
+        <div class="mb-2">
+          <span class="text-on-primary/60 text-sm font-semibold uppercase tracking-wider">Monthly Management Plan</span>
+        </div>
+        <div class="flex items-end gap-2 mb-6 mt-2">
+          <span class="text-6xl font-bold">$149</span>
+          <span class="text-on-primary/70 mb-2 text-lg">/month</span>
+        </div>
+        <p class="text-on-primary/80 leading-relaxed mb-8">Website design and build is provided at no upfront cost. Management begins from your first month.</p>
+        <ul class="space-y-4 flex-1 mb-10">
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Professional website — designed, built, and deployed</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Hosting on Vercel's global Edge Network (CDN)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">TLS 1.3 encryption &amp; automatic SSL renewal</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Domain management &amp; DNS configuration</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Ongoing content updates &amp; support</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Local SEO &amp; AI search optimisation (GEO)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-on-primary/80 flex-shrink-0 mt-0.5" style="font-size:1.1rem">check_circle</span>
+            <span class="text-on-primary/90">Monthly performance report</span>
+          </li>
+        </ul>
+        <a href="#contact" id="pricing-cta-btn" class="bg-white text-primary py-4 rounded-xl font-bold text-center hover:bg-opacity-90 transition-all block">Get Started</a>
+        <p class="text-on-primary/50 text-xs text-center mt-4">12-month minimum term. Month-to-month thereafter.</p>
+      </div>
+
+      <!-- Add-ons -->
+      <div class="bg-surface-container-low rounded-[2rem] p-10 flex flex-col border border-outline-variant/30">
+        <h3 class="text-2xl font-bold text-primary mb-2">Optional Add-ons</h3>
+        <p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Additional services are available on request, billed transparently at an agreed rate.</p>
+        <ul class="space-y-5 flex-1">
+          <li class="flex items-start gap-4 pb-5 border-b border-outline-variant/20">
+            <span class="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">add_circle</span>
+            <div>
+              <p class="font-semibold text-on-surface">Google Business Profile Management</p>
+              <p class="text-on-surface-variant text-sm">Optimise and maintain your local listing for improved map and search visibility.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4 pb-5 border-b border-outline-variant/20">
+            <span class="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">add_circle</span>
+            <div>
+              <p class="font-semibold text-on-surface">Landing Page Design</p>
+              <p class="text-on-surface-variant text-sm">Targeted pages for specific services or campaigns, built to convert.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4 pb-5 border-b border-outline-variant/20">
+            <span class="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">add_circle</span>
+            <div>
+              <p class="font-semibold text-on-surface">Analytics & Conversion Reporting</p>
+              <p class="text-on-surface-variant text-sm">Google Analytics 4 integration with monthly insights on traffic and leads.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <span class="material-symbols-outlined text-primary flex-shrink-0 mt-0.5">add_circle</span>
+            <div>
+              <p class="font-semibold text-on-surface">Social Media Strategy</p>
+              <p class="text-on-surface-variant text-sm">Content planning and channel strategy tailored to your target market.</p>
+            </div>
+          </li>
+        </ul>
+        <a href="#contact" class="mt-10 border-2 border-primary text-primary py-4 rounded-xl font-bold text-center hover:bg-primary hover:text-on-primary transition-all block">Enquire About Add-ons</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="py-24 px-6 md:px-8 bg-surface" id="contact" aria-label="Contact">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-surface-container-low rounded-[3rem] p-10 md:p-16 border-t-8 border-primary">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold text-primary mb-4">Start a Conversation</h2>
+          <p class="text-lg text-on-surface-variant max-w-2xl mx-auto">Describe your business and what you need from your website. I'll review your current online presence and outline what's possible.</p>
+        </div>
+        <form class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left" name="contact" method="POST" action="mailto:hello@machinefaith.com.au">
+          <div class="space-y-2">
+            <label class="text-sm font-bold text-primary ml-2" for="contact-name">Name</label>
+            <input id="contact-name" name="name" class="w-full px-6 py-4 rounded-xl border border-outline-variant/30 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Your Name" type="text"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-bold text-primary ml-2" for="contact-email">Email</label>
+            <input id="contact-email" name="email" class="w-full px-6 py-4 rounded-xl border border-outline-variant/30 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="your@email.com" type="email"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-bold text-primary ml-2" for="contact-business">Business Name</label>
+            <input id="contact-business" name="business" class="w-full px-6 py-4 rounded-xl border border-outline-variant/30 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Your Business" type="text"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-bold text-primary ml-2" for="contact-website">Current Website (if any)</label>
+            <input id="contact-website" name="website" class="w-full px-6 py-4 rounded-xl border border-outline-variant/30 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="www.yourbusiness.com.au" type="text"/>
+          </div>
+          <div class="md:col-span-2 space-y-2">
+            <label class="text-sm font-bold text-primary ml-2" for="contact-message">What do you need?</label>
+            <textarea id="contact-message" name="message" class="w-full px-6 py-4 rounded-xl border border-outline-variant/30 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Briefly describe your business and what you're looking for..." rows="4"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <button id="contact-submit-btn" type="submit" class="w-full bg-primary text-on-primary py-5 rounded-xl text-lg font-bold shadow-xl hover:translate-y-[-2px] transition-all">Send Message</button>
+            <p class="mt-4 text-sm text-on-surface-variant text-center">Prefer to call? <a href="tel:04XXXXXXXX" class="font-bold text-primary hover:underline">04XX XXX XXX</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-[#f4f4ef] py-16 px-6 md:px-8 mt-8">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
+    <div class="max-w-sm">
+      <img alt="Machine Faith" class="h-8 w-auto object-contain mb-6" src="images/logo.png"/>
+      <p class="text-[#2C3E50] mb-6 leading-relaxed text-sm">Website management and digital strategy for small businesses that want a reliable, professional online presence — without the complexity.</p>
+      <div class="flex gap-4">
+        <a href="mailto:hello@machinefaith.com.au" aria-label="Email" class="hover:opacity-70 transition-opacity">
+          <span class="material-symbols-outlined text-primary">mail</span>
+        </a>
+        <a href="tel:04XXXXXXXX" aria-label="Call" class="hover:opacity-70 transition-opacity">
+          <span class="material-symbols-outlined text-primary">phone_iphone</span>
+        </a>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-16">
+      <div class="space-y-4">
+        <p class="text-xs font-bold text-primary uppercase tracking-widest">Navigation</p>
+        <ul class="space-y-3 text-sm">
+          <li><a class="text-[#2C3E50] hover:underline" href="#services">Services</a></li>
+          <li><a class="text-[#2C3E50] hover:underline" href="#infrastructure">Infrastructure</a></li>
+          <li><a class="text-[#2C3E50] hover:underline" href="#pricing">Pricing</a></li>
+          <li><a class="text-[#2C3E50] hover:underline" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <p class="text-xs font-bold text-primary uppercase tracking-widest">Legal</p>
+        <ul class="space-y-3 text-sm">
+          <li><a class="text-[#2C3E50] hover:underline" href="#">Privacy Policy</a></li>
+          <li><a class="text-[#2C3E50] hover:underline" href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-outline-variant/30 text-sm text-on-surface-variant">
+    © Machine Faith. ABN pending. Sydney, Australia. All rights reserved.
+  </div>
+</footer>
+
+<!-- Floating Action Button -->
+<div class="fixed bottom-8 right-8 z-40 hidden md:block">
+  <a href="#contact" id="fab-btn" class="bg-primary text-white p-4 rounded-full shadow-2xl flex items-center gap-3 pr-6 group hover:scale-105 transition-transform">
+    <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+      <span class="material-symbols-outlined text-white text-xl">chat_bubble</span>
+    </div>
+    <span class="font-medium text-sm">Get in touch</span>
+  </a>
+</div>
+
+<script>
+  const toggle = document.getElementById('mobile-toggle');
+  const menu = document.getElementById('mobile-menu');
+  toggle.addEventListener('click', () => menu.classList.toggle('open'));
+  menu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => menu.classList.remove('open')));
+</script>
+</body>
+</html>
