@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Exciting Websites · Tradie Outreach</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; -webkit-tap-highlight-color: transparent; }
+  textarea { resize: vertical; }
+  .flag { background: rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.3); }
+</style>
+</head>
+<body class="min-h-screen pb-20">
+
+<!-- Sticky Header -->
+<header class="border-b border-slate-800 bg-[#0f172a]/95 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+    <div>
+      <h1 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A4E]"></span>
+        Tradie Leads <span class="text-xs font-normal text-slate-400">· 26 Ready</span>
+      </h1>
+      <p class="text-[11px] text-slate-400">Nash tone · $0 build / $99 mo · Tap SMS to open Messages</p>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95">📷 Drop</button>
+      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FF5A4E] text-white active:scale-95">+ Add</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-4 gap-2 text-center" id="stats"></div>
+
+  <!-- Search & Filter bar -->
+  <div class="space-y-2">
+    <input id="search" oninput="render()" placeholder="🔍 Search name, phone, trade, suburb..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF5A4E]">
+    <div id="filters" class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none"></div>
+  </div>
+
+  <!-- Quick Objection Cheat Sheet -->
+  <details class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-xs">
+    <summary class="font-bold text-slate-300 cursor-pointer flex justify-between items-center">
+      <span>⚡ Quick Replies (When they reply)</span>
+      <span class="text-slate-500 text-[10px]">Tap to copy</span>
+    </summary>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mt-3" id="replies"></div>
+  </details>
+
+  <!-- Leads List -->
+  <div id="leads" class="space-y-3"></div>
+
+</main>
+
+<!-- Upload Screenshot Modal -->
+<div id="uploadModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4 text-sm">
+    <div class="flex justify-between items-center">
+      <h3 class="font-bold text-base text-white">Upload Screenshot</h3>
+      <button type="button" onclick="toggleUpload(false)" class="text-slate-400 text-lg">✕</button>
+    </div>
+    <p class="text-xs text-slate-400">Take a screenshot on Instagram, Facebook, or Google Maps. Upload or paste it here to extract phone & details.</p>
+    
+    <label class="border-2 border-dashed border-slate-700 hover:border-[#FF5A4E] rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-800/50">
+      <span class="text-2xl">📸</span>
+      <span class="text-xs font-semibold text-slate-300">Choose photo or take picture</span>
+      <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+    </label>
+
+    <div id="imagePreview" class="hidden space-y-2">
+      <img id="previewImg" class="max-h-48 rounded-lg mx-auto border border-slate-800">
+      <p class="text-xs text-emerald-400 text-center font-medium">Image loaded! Fill quick details or tap add:</p>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" onclick="toggleUpload(false)" class="px-3 py-2 text-slate-400">Cancel</button>
+      <button type="button" onclick="openManualWithPhoto()" class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold">Use Photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manual Add Modal -->
+<div id="addModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+  <form onsubmit="addLead(event)" class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-3 text-sm">
+    <div class="flex justify-between items-center">
+      <h3 class="font-bold text-base text-white">Add New Tradie</h3>
+      <button type="button" onclick="toggleAdd(false)" class="text-slate-400 text-lg">✕</button>
+    </div>
+    <input required name="name" placeholder="Business name (e.g. Masterworks Rendering)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    <div class="grid grid-cols-2 gap-2">
+      <input name="first" placeholder="Contact first name" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+      <input required name="trade" placeholder="Trade (e.g. renderer)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    </div>
+    <input required name="handle" placeholder="Phone or @instagram" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    <input name="detail" placeholder="Job photo detail (e.g. curved planter wall render)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" onclick="toggleAdd(false)" class="px-3 py-2 text-slate-400">Cancel</button>
+      <button class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold">Save Lead</button>
+    </div>
+  </form>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
+
+<script>
+const STORE = "ew_crm_v3";
+const PLACEHOLDER = "[something from their page]";
+
+const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
+  "streamline", "solution", "leverage", "boost", "game-changer", "game changer", "next level",
+  "hope this finds you well", "touch base", "circle back", "cutting-edge", "robust", "tailored", "unlock"];
+
+const REPLIES = {
+  "Pricing?": "Yeah so the build's free, you see it before paying anything. If you want me to host it, keep it secure, sync your posts and sort the quote form alerts it's $99/mo and I can do the first month free so you can see if it's even worth it. You'd grab the domain yourself so it's in your name, only like $20-25 a year.",
+  "What's catch?": "No catch really haha. I'd rather you see it first than pay for something blind. If you like it we go from there, if not no worries at all.",
+  "Flat out": "No stress at all! Me too haha. That's kind of the point though, once it's set up you just keep posting like normal and the site updates itself. Flick me a message whenever you get a sec.",
+  "Just use FB": "Yeah Facey's great for showing the work. Just find a lot of people would rather check a website and hit call than send a DM and wait around. And it pulls from your page so you don't have to do anything extra.",
+  "Send example": "Yeah for sure! Here's one I just did for an air con business on the Central Coast https://coast2country-air.vercel.app/ it pulls his Facey posts in automatically. Happy to have a crack at one for you so you can see it with your stuff.",
+  "Yeah go for it": "Sweet! I'll have a crack at it. I'll just use some of the photos off your page but send over any others you want in there. Otherwise I'll have a go and we can tweak it after.",
+  "Have a site": "Ah sweet, no worries at all! Good luck with it",
+  "Follow up": "Hey! No stress but did you get a chance to look at this?",
+};
+
+const OPENERS = [
+  (hi, d, t) => `${hi} Was just looking at your page, ${d} looks really good. Noticed you don't have a website linked anywhere. I build sites for ${t} that pull your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!`,
+  (hi, d, t) => `${hi} Came across your page, love ${d}. Do you have a website at all? I make sites for local businesses that sync with your Insta or Facey so you don't have to update anything. I can mock one up for free if you want to have a look. Let me know what you reckon!`,
+  (hi, d, t) => `${hi} ${cap(d)} came up really clean. Not sure if you've thought about a website but I build them for ${t} and they copy your posts across automatically. Keen to have a go at one for you, costs nothing to see it. No worries if you're flat out!`,
+];
+
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+function draft(first, detail, trade) {
+  const hi = first ? `Hey ${first}!` : "Hey!";
+  const d = detail || PLACEHOLDER;
+  return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d, plural(trade));
+}
+
+function plural(trade) {
+  const t = (trade || "tradie").toLowerCase().trim();
+  if (t.endsWith("man")) return t.slice(0, -3) + "men";
+  if (t.endsWith("s")) return t;
+  return t + "s";
+}
+
+const SEED = [
+  {
+    id: 1,
+    name: "Coast To Country Termite And Pest",
+    first: "",
+    phone: "0432338002",
+    handle: "0432 338 002",
+    link: "tel:0432338002",
+    trade: "pest controller",
+    detail: "that termite management install in Ocean Shores",
+    notes: "Ballina / Northern Rivers NSW · coasttwocountry@gmail.com · Twin name with Coast 2 Country Air!",
+    msg: "Hey! Was just looking at your page, that termite management install in Ocean Shores looked super clean. Funny enough I actually just built coast2country-air.vercel.app for Nash on the Central Coast haha. Noticed you don't have a website linked anywhere. I build sites for pest controllers that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 2,
+    name: "Masterworks Rendering Services",
+    first: "Lachlan",
+    phone: "0405358938",
+    handle: "0405 358 938 · @masterworks_rendering_services",
+    link: "https://www.instagram.com/masterworks_rendering_services/",
+    trade: "renderer",
+    detail: "that curved planter wall render",
+    notes: "Sydney 2229 (Sutherland Shire). Modern facades, zero website.",
+    msg: "Hey Lachlan! Was just looking at your page, that curved planter wall render looked unreal. Noticed you don't have a website linked anywhere. I build sites for renderers that pull your Insta posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+  },
+  {
+    id: 3,
+    name: "Lachlan Jones Painting & Decorating",
+    first: "Lachlan",
+    phone: "0403333497",
+    handle: "0403 333 497 · @lachlanjonespainting",
+    link: "https://www.instagram.com/lachlanjonespainting/",
+    trade: "painter",
+    detail: "that pool and deck repaint",
+    notes: "Central Coast / Hunter. Lic 474003C. Roof & driveway restoration.",
+    msg: "Hey Lachlan! Came across your page, that pool and deck paint work came up really clean. Do you have a website at all? I make sites for painters that sync with your Insta so you don't have to update anything. Happy to mock one up for you for free so you can have a look. Let me know what you reckon!"
+  },
+  {
+    id: 4,
+    name: "Chapo's Concrete",
+    first: "Ryan",
+    phone: "0411141081",
+    handle: "0411 141 081 · @chapos_concrete",
+    link: "https://www.instagram.com/chapos_concrete/",
+    trade: "concreter",
+    detail: "that basketball court slab",
+    notes: "Gawler / Barossa SA. BLD 278399. Exposed agg driveways.",
+    msg: "Hey Ryan! Came across your page, that basketball court slab came up mint. Do you have a website at all? I make sites for concreters that sync with your Facey or Insta so you don't have to touch anything. Happy to mock one up for you for free so you can see what it looks like. Let me know what you reckon!"
+  },
+  {
+    id: 5,
+    name: "Walsh Electrical",
+    first: "",
+    phone: "0423341124",
+    handle: "0423 341 124 · @walsh.electrical",
+    link: "https://www.instagram.com/walsh.electrical/",
+    trade: "electrician",
+    detail: "that rural shed wiring and switchboard upgrade",
+    notes: "Scone / Upper Hunter NSW. Lic 404730C. info@walshlec.com.",
+    msg: "Hey! Was just looking at your page, that rural shed setup and switchboard upgrade looked really tidy. Noticed you don't have a website linked anywhere. I build sites for sparkies that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 6,
+    name: "Advanced Roofing Services Pty Ltd",
+    first: "Michael",
+    phone: "0407087619",
+    handle: "0407 087 619 · @advancedroofingservicespty",
+    link: "https://www.instagram.com/advancedroofingservicespty/",
+    trade: "roofer",
+    detail: "that terracotta tile roof restoration",
+    notes: "Michael Gibbs. Sydney / NSW. Roof restoration.",
+    msg: "Hey Michael! Came across your page, that terracotta roof restoration came up really clean. Do you have a website at all? I make sites for roofers that sync with your Insta so you don't have to update anything. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+  },
+  {
+    id: 7,
+    name: "WD Mowing Service",
+    first: "William",
+    phone: "0499267165",
+    handle: "0499 267 165 · @service.wdmowing",
+    link: "tel:0499267165",
+    trade: "lawn care specialist",
+    detail: "the commercial mowing setup on your ute",
+    notes: "Gatton / Toowoomba QLD. Google Maps listing has 0 website button.",
+    msg: "Hey William! Was just looking at your page, the setup on your ute and the acreage mowing work looks top notch. Noticed on Google you don't have a website button yet. I build sites for lawn care businesses that pull your posts across automatically. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 8,
+    name: "Marsina Civil & Excavation",
+    first: "",
+    phone: "0406431318",
+    handle: "0406 431 318 · @marsina_excavation",
+    link: "https://www.instagram.com/marsina_excavation/",
+    trade: "earthmover",
+    detail: "that trenching job for the driveway sensor installation",
+    notes: "Western Sydney. 5.5T excavator + tipper wet hire.",
+    msg: "Hey! Came across your page, that trenching job for the driveway sensor installation looked really tidy. Do you have a website at all? I build sites for excavation crews that pull your Insta posts across automatically so you don't have to update anything. Happy to have a crack at one for you for free. Let me know what you reckon!"
+  },
+  {
+    id: 9,
+    name: "Southern Mobile Trailer Services",
+    first: "Mat",
+    phone: "0402946179",
+    handle: "0402 946 179 · @southernmobiletrailer.s",
+    link: "tel:0402946179",
+    trade: "trailer mechanic",
+    detail: "your mobile trailer repair setup",
+    notes: "Mat Nesbitt. Mobile trailer mechanic, wheel bearings, brakes.",
+    msg: "Hey Mat! Was just looking at your page, love the mobile trailer mechanic setup. Noticed you don't have a website linked anywhere. I build clean one-page sites for mobile trades that make it dead easy for people to tap call directly off Google. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 10,
+    name: "Erae's Tree Lopping Service",
+    first: "David",
+    phone: "0415216640",
+    handle: "0415 216 640 · @d.tanielu29",
+    link: "tel:0415216640",
+    trade: "arborist",
+    detail: "that tree removal and stump grind",
+    notes: "Camden South NSW. 17 FB reviews. david_erae@hotmail.com.",
+    msg: "Hey David! Came across your page, that tree removal and stump grind work looks really solid. Noticed you've got 17 solid reviews on Facey. I make modern sites for tree loppers that showcase your reviews and pull your posts across automatically. Happy to have a crack at one for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 11,
+    name: "Premium Waterproofing Experts",
+    first: "Elias",
+    phone: "0435554466",
+    handle: "0435 55 44 66 · @premium.waterproofing.experts",
+    link: "https://www.instagram.com/premium.waterproofing.experts/",
+    trade: "waterproofer",
+    detail: "that bathroom waterproofing in Box Hill",
+    notes: "Sydney. Retaining walls, bathrooms. Bio links to personal FB.",
+    msg: "Hey Elias! Was just looking at your page, that bathroom membrane work in Box Hill looked really clean. Noticed your bio just points to a personal Facebook link. I build sites for waterproofers that pull your Insta posts across automatically. Keen to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 12,
+    name: "Iron Bark Structural Landscaping",
+    first: "Lachy",
+    phone: "0432205115",
+    handle: "0432 205 115 · @ironbark_structurallandscaping",
+    link: "https://www.instagram.com/ironbark_structurallandscaping/",
+    trade: "landscaper",
+    detail: "that pool coping and retaining wall",
+    notes: "Newcastle & Lake Macquarie. Lachy@ironbarklandscapes.com.",
+    msg: "Hey Lachy! Came across your page, that pool coping and retaining wall came up unreal. Noticed you're just getting the Insta page rolling with no website linked. I make sites for structural landscapers that sync your posts across automatically. Happy to have a crack at one for you for free and you can see what you reckon. No worries if you're flat out!"
+  },
+  {
+    id: 13,
+    name: "Absolute Render Gold Coast",
+    first: "Clint",
+    phone: "0406930004",
+    handle: "0406 930 004 · @absolute_render_gold_coast",
+    link: "https://www.instagram.com/absolute_render_gold_coast/",
+    trade: "renderer",
+    detail: "that Venetian plaster feature wall",
+    notes: "Clint Crockett. Gold Coast QLD. 23 yrs exp. Microcement.",
+    msg: "Hey Clint! Was just looking at your page, that Venetian plaster feature wall looked unreal. Noticed you don't have a website linked anywhere. I build sites for renderers that pull your Insta posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+  },
+  {
+    id: 14,
+    name: "Perri Building & Construction",
+    first: "Frank",
+    phone: "0497761573",
+    handle: "0497 761 573 · perribuildingandconstruction@gmail.com",
+    link: "tel:0497761573",
+    trade: "builder",
+    detail: "that privacy wall replacement in Hammondville",
+    notes: "Hammondville Sydney. Lic 489175C. Facebook only.",
+    msg: "Hey Frank! Came across your work, that privacy wall replacement in Hammondville came up really clean. Noticed you only have a Facebook page at the moment. I build sites for builders that sync with your social posts so you don't have to manage anything. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 15,
+    name: "Opal Painting",
+    first: "Alex",
+    phone: "0401007374",
+    handle: "0401 007 374 · @opal_painting",
+    link: "https://www.instagram.com/opal_painting/",
+    trade: "painter",
+    detail: "that blue accent wall and interior trim",
+    notes: "Sydney. Interior/exterior. Links back to FB profile.",
+    msg: "Hey Alex! Was just looking at your page, that blue accent wall and interior trim came up really sharp. Noticed your link just goes back to Facebook. I build sites for painters that pull your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free. Let me know what you reckon!"
+  },
+  {
+    id: 16,
+    name: "Hercules Rubbish Removals",
+    first: "Jesse",
+    phone: "0451941864",
+    handle: "0451 941 864",
+    link: "tel:0451941864",
+    trade: "rubbish removalist",
+    detail: "the deceased estate cleanout",
+    notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955.",
+    msg: "Hey Jesse! Came across your page, the cleanout work you guys do is massive. Noticed you don't have a website linked anywhere. I build one-page sites for rubbish removalists that make it dead easy for people to tap call or request a quick quote. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 17,
+    name: "JD Engineering Works",
+    first: "Joss",
+    phone: "0478584837",
+    handle: "0478 584 837",
+    link: "tel:0478584837",
+    trade: "aluminium fabricator",
+    detail: "those aluminium hungry boards on the tippers",
+    notes: "Melbourne VIC. Tipper hungry boards, aluminium trays.",
+    msg: "Hey Joss! Was just looking at your page, those custom aluminium hungry boards for the tippers look top quality. Noticed you don't have a website linked anywhere. I build sites for fabricators that pull your build photos across automatically. Keen to have a crack at one for you for free so you can see what you reckon. No worries if you're flat out!"
+  },
+  {
+    id: 18,
+    name: "Jake's Tree Services",
+    first: "Jake",
+    phone: "0411092983",
+    handle: "0411 092 983 · @jakestree87",
+    link: "tel:0411092983",
+    trade: "tree lopper",
+    detail: "that tree lopping and stump grind",
+    notes: "NSW. Tree lopping, stump grinding. Insta page only.",
+    msg: "Hey Jake! Came across your page, that tree lopping and stump grinding work looks really solid. Noticed you don't have a website linked anywhere. I build sites for tree loppers that pull your posts across automatically so it keeps itself updated. Happy to mock one up for you for free so you can see what you reckon. Let me know if you're keen!"
+  },
+  {
+    id: 19,
+    name: "George's Gardening",
+    first: "George",
+    phone: "",
+    handle: "george.gardening1@gmail.com · @georges.gardening",
+    link: "https://www.instagram.com/georges.gardening/",
+    trade: "gardener",
+    detail: "that commercial hedge trimming at Rashays",
+    notes: "Fairfield / Western Sydney. ABN 82 326 455 924. 10+ yrs.",
+    msg: "Hey George! Was just looking at your page, that hedge trimming work at Rashays looked really tidy. Noticed you don't have a website linked anywhere. I build sites for gardeners that pull your Insta posts across automatically so you don't have to update anything. Happy to have a crack at one for you for free. No stress if not!"
+  },
+  {
+    id: 20,
+    name: "Truebond Floors",
+    first: "",
+    phone: "",
+    handle: "@truebondfloors",
+    link: "https://www.instagram.com/truebondfloors/",
+    trade: "epoxy flooring specialist",
+    detail: "that flake garage floor in Prestons",
+    notes: "Prestons / Liverpool Sydney. DMs only for quotes.",
+    msg: "Hey! Came across your page, that flake garage floor in Prestons came up unreal. Noticed you just have DM for quotes in your bio with no website. I make sites for epoxy specialists that showcase your floor finishes and pull your posts across automatically. Happy to mock one up for you for free so you can see what you reckon. Let me know what you think!"
+  },
+  {
+    id: 21,
+    name: "Elite Chase & Core",
+    first: "",
+    phone: "0405632534",
+    handle: "0405 632 534 · @elitechaseandcore",
+    link: "https://www.instagram.com/elitechaseandcore/",
+    trade: "core driller",
+    detail: "that core drilling and wall chasing",
+    notes: "Sydney. Elitewallchasing@outlook.com. No website.",
+    msg: "Hey! Was just looking at your page, that core drilling and wall chasing work is super clean. Noticed you don't have a website linked anywhere. I build sites for specialist trades that make it easy for builders to tap call and view your capabilities. Keen to have a go at one for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 22,
+    name: "Dee's Lawn & Landscaping",
+    first: "Dee",
+    phone: "",
+    handle: "deeslawnandlandscaping@gmail.com · @deeslawnandlandscaping",
+    link: "https://www.instagram.com/deeslawnandlandscaping/",
+    trade: "landscaper",
+    detail: "that garden turfing and cleanup",
+    notes: "Sydney. Bio only links to Facebook profile.",
+    msg: "Hey Dee! Came across your page, that turfing and garden cleanup came up really fresh. Noticed your bio only links to Facebook. I build sites for landscapers that sync your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free so you can see what you reckon. No worries if you're flat out!"
+  },
+  {
+    id: 23,
+    name: "Condor Concrete Solutions",
+    first: "",
+    phone: "+61478136422",
+    handle: "+61 478 136 422 · @condorconcretesolutions",
+    link: "tel:+61478136422",
+    trade: "concreter",
+    detail: "that exposed aggregate driveway and pool surround",
+    notes: "Perth WA. Exposed aggregate, zero website.",
+    msg: "Hey! Was just looking at your page, that exposed aggregate driveway and pool surround looked mint. Noticed you don't have a website linked anywhere. I build sites for concreters that pull your posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+  },
+  {
+    id: 24,
+    name: "Green Acres",
+    first: "",
+    phone: "0255642925",
+    handle: "02 5564 2925 · @green_acres_southcoast",
+    link: "https://www.instagram.com/green_acres_southcoast/",
+    trade: "lawn specialist",
+    detail: "that lawn scarifying and topdressing",
+    notes: "Moruya NSW / South Coast / ACT. Zero website.",
+    msg: "Hey! Came across your page, that lawn scarifying and topdressing job came up unreal. Noticed you don't have a website linked anywhere. I make sites for lawn care businesses that pull your posts across automatically so you don't have to update anything. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  },
+  {
+    id: 25,
+    name: "LJ Roof Maintenance & Construction",
+    first: "Luke",
+    phone: "0457244729",
+    handle: "0457 244 729 · @lj_roofmaintenance",
+    link: "tel:0457244729",
+    trade: "roofer",
+    detail: "that ridge capping and gutter repair",
+    notes: "Luke. NSW. ABN 88 790 724 500. Repointing & restoration.",
+    msg: "Hey Luke! Was just looking at your page, that ridge capping and gutter repair looked really tidy. Noticed you don't have a website linked anywhere. I build sites for roofers that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free so you can see what you reckon. Let me know what you think!"
+  },
+  {
+    id: 26,
+    name: "Corfe Plant Solutions Pty Ltd",
+    first: "",
+    phone: "0402138280",
+    handle: "0402 138 280 · @corfeplantsolutions",
+    link: "tel:0402138280",
+    trade: "plant hire operator",
+    detail: "your machinery hire fleet",
+    notes: "CPS Hire. Machinery & excavator hire. Zero website.",
+    msg: "Hey! Came across your page, great lineup of equipment in the fleet. Noticed you don't have a website linked anywhere. I build clean one-page sites for plant hire operators that make it dead easy for contractors to tap call or check availability. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+  }
+];
+
+let leads = JSON.parse(localStorage.getItem(STORE) || "null") || SEED.map(l => ({
+  ...l,
+  status: "TO_SEND"
+}));
+
+let filter = "ALL";
+const STATUSES = { TO_SEND: "To send", SENT: "Sent", REPLIED: "Replied", WON: "Won", DEAD: "Not interested" };
+
+function save() { localStorage.setItem(STORE, JSON.stringify(leads)); }
+
+function problems(text) {
+  const low = (text || "").toLowerCase();
+  const found = BANNED.filter(w => low.includes(w)).map(w => w === "\u2014" || w === "\u2013" ? "dash" : w);
+  if (text && text.includes("[")) found.unshift("unfilled blank");
+  return found;
+}
+
+function esc(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+
+function getSmsLink(phone, msg) {
+  if (!phone) return null;
+  const cleanPhone = phone.replace(/\s+/g, "");
+  // iOS and Android compatible SMS link with encoded body
+  return `sms:${cleanPhone}?&body=${encodeURIComponent(msg)}`;
+}
+
+function render() {
+  const count = s => leads.filter(l => l.status === s).length;
+  document.getElementById("stats").innerHTML = [
+    ["All", leads.length, "text-white"],
+    ["To Send", count("TO_SEND"), "text-emerald-400 font-bold"],
+    ["Sent", count("SENT"), "text-blue-400 font-bold"],
+    ["Won", count("WON"), "text-amber-400 font-bold"]
+  ].map(([l, n, c]) => `<div class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-1"><div class="text-[10px] text-slate-400">${l}</div><div class="text-base sm:text-lg ${c}">${n}</div></div>`).join("");
+
+  document.getElementById("filters").innerHTML = ["ALL", ...Object.keys(STATUSES)].map(s =>
+    `<button onclick="filter='${s}';render()" class="text-xs whitespace-nowrap font-semibold px-3 py-1.5 rounded-lg transition ${filter === s ? "bg-[#FF5A4E] text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}">${s === "ALL" ? "All" : STATUSES[s]}</button>`).join("");
+
+  const q = document.getElementById("search").value.toLowerCase();
+  const list = leads.filter(l => (filter === "ALL" || l.status === filter) &&
+    (l.name + (l.handle || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q));
+
+  document.getElementById("leads").innerHTML = list.length ? list.map(l => {
+    const p = problems(l.msg);
+    const sms = getSmsLink(l.phone, l.msg);
+    return `
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 space-y-3">
+      <div class="flex justify-between items-start gap-2">
+        <div class="min-w-0">
+          <div class="font-bold text-base text-white truncate">${esc(l.name)}</div>
+          <div class="text-xs text-slate-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+            <span class="text-slate-300 font-medium">${esc(l.trade)}</span>
+            ${l.phone ? `<span>·</span><a href="tel:${esc(l.phone)}" class="text-[#FF5A4E] font-medium">${esc(l.phone)}</a>` : ""}
+            ${l.link && !l.link.startsWith("tel:") ? `<span>·</span><a href="${esc(l.link)}" target="_blank" class="text-[#FF5A4E] underline text-[11px]">View Social ↗</a>` : ""}
+          </div>
+        </div>
+        <select onchange="setField(${l.id},'status',this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-semibold text-slate-200 shrink-0">
+          ${Object.entries(STATUSES).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <input value="${esc(l.first)}" onchange="setField(${l.id},'first',this.value,true)" placeholder="First name" class="bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        <input value="${esc(l.detail)}" onchange="setField(${l.id},'detail',this.value,true)" placeholder="Job detail" class="bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white">
+      </div>
+
+      <textarea rows="3" oninput="setMsg(${l.id},this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs sm:text-sm leading-relaxed text-slate-200 focus:outline-none focus:border-[#FF5A4E]">${esc(l.msg)}</textarea>
+
+      ${l.notes ? `<div class="text-[11px] text-slate-400 bg-slate-950/60 rounded-lg px-2.5 py-1.5 border border-slate-800/70"><span class="text-slate-500 font-medium">Context: </span>${esc(l.notes)}</div>` : ''}
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+        <div id="flags-${l.id}" class="flex flex-wrap gap-1">${p.map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("")}</div>
+        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+          <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-roll</button>
+          ${sms ? `<a href="${sms}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 active:scale-95">💬 Open SMS</a>` : ""}
+          <button onclick="copyLead(${l.id})" class="text-xs font-bold px-3.5 py-2 rounded-lg bg-[#FF5A4E] hover:bg-[#ff4436] text-white active:scale-95">📋 Copy</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("") : `<div class="text-slate-400 text-sm text-center py-12">No leads found.</div>`;
+}
+
+function renderReplies() {
+  document.getElementById("replies").innerHTML = Object.keys(REPLIES).map((k, i) =>
+    `<button onclick="copy(REPLIES['${k}'])" class="text-left p-2 rounded-lg bg-slate-800/90 border border-slate-700 hover:border-[#FF5A4E] text-[11px] font-semibold text-slate-200 active:scale-95 truncate">${k}</button>`).join("");
+}
+
+function find(id) { return leads.find(l => l.id === id); }
+
+function setField(id, field, val, redraft) {
+  const l = find(id); if (!l) return;
+  l[field] = val.trim();
+  if (redraft) l.msg = draft(l.first, l.detail, l.trade);
+  save(); render();
+}
+
+function setMsg(id, val) {
+  const l = find(id); if (!l) return;
+  l.msg = val; save();
+  const el = document.getElementById("flags-" + id);
+  if (el) el.innerHTML = problems(val).map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("");
+}
+
+function reroll(id) {
+  const l = find(id); if (!l) return;
+  l.msg = draft(l.first, l.detail, l.trade); save(); render();
+}
+
+function markSent(id) {
+  const l = find(id);
+  if (l && l.status === "TO_SEND") { l.status = "SENT"; save(); setTimeout(render, 500); }
+}
+
+function copyLead(id) {
+  const l = find(id); if (!l) return;
+  const p = problems(l.msg);
+  if (p.length) { toast("Fix first: " + p.join(", "), true); return; }
+  copy(l.msg);
+  markSent(id);
+}
+
+function copy(text) {
+  navigator.clipboard.writeText(text).then(() => toast("✓ Copied to clipboard!"));
+}
+
+function toast(msg, bad) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl transition-all duration-200 z-50 ${bad ? "bg-red-500 text-white" : "bg-emerald-500 text-white"}`;
+  t.style.opacity = "1";
+  setTimeout(() => { t.style.opacity = "0"; }, 2000);
+}
+
+function toggleUpload(open) {
+  const m = document.getElementById("uploadModal");
+  m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
+}
+
+function toggleAdd(open) {
+  const m = document.getElementById("addModal");
+  m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
+}
+
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    document.getElementById("previewImg").src = event.target.result;
+    document.getElementById("imagePreview").classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+}
+
+function openManualWithPhoto() {
+  toggleUpload(false);
+  toggleAdd(true);
+}
+
+function addLead(e) {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const h = f.handle.trim();
+  const cleanDigits = h.replace(/[^0-9+]/g, "");
+  const phone = cleanDigits.length >= 8 ? cleanDigits : "";
+  const link = phone ? `tel:${phone}` : h.startsWith("@") ? `https://www.instagram.com/${h.slice(1)}/` : h;
+  leads.unshift({
+    id: Date.now(),
+    name: f.name.trim(),
+    first: f.first.trim(),
+    phone,
+    handle: h,
+    link,
+    trade: f.trade.trim(),
+    detail: f.detail.trim(),
+    status: "TO_SEND",
+    notes: "Added via mobile",
+    msg: draft(f.first.trim(), f.detail.trim(), f.trade.trim())
+  });
+  save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added!");
+}
+
+renderReplies();
+render();
+</script>
+</body>
+</html>
