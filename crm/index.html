@@ -22,13 +22,16 @@
         <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
         Tradie Leads <span class="text-xs font-normal text-slate-400">· Outreach Pipeline</span>
       </h1>
-      <p class="text-[11px] text-slate-400">Auto-moves to "Sent" on click · Includes @excitingwebsite link</p>
+      <p class="text-[11px] text-slate-400">Auto-moves to "Sent" · Custom template editor built-in</p>
     </div>
     <div class="flex items-center gap-1.5">
-      <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
-        <span>📸</span> Scrape Photo
+      <button onclick="toggleTemplate(true)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95 flex items-center gap-1" title="Edit message template across all leads">
+        <span>⚙️</span> Template
       </button>
-      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95">+ Add</button>
+      <button onclick="toggleUpload(true)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
+        <span>📸</span> Scrape
+      </button>
+      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FF5A4E] text-white active:scale-95">+ Add</button>
     </div>
   </div>
 </header>
@@ -63,6 +66,47 @@
   <div id="leads" class="space-y-3"></div>
 
 </main>
+
+<!-- Global Template & Tone Editor Modal -->
+<div id="templateModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-5 space-y-4 text-sm max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-base text-white flex items-center gap-1.5">
+          <span>⚙️</span> Global Message Template
+        </h3>
+        <p class="text-[11px] text-slate-400">Edit your message once to update every lead in the app</p>
+      </div>
+      <button type="button" onclick="toggleTemplate(false)" class="text-slate-400 text-lg">✕</button>
+    </div>
+
+    <div>
+      <div class="flex justify-between items-center mb-1.5">
+        <label class="text-xs font-semibold text-slate-300">Message Formula</label>
+        <div class="flex gap-1 text-[10px]">
+          <button type="button" onclick="insertTag('{name}')" class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[#FF5A4E]">+ {name}</button>
+          <button type="button" onclick="insertTag('{detail}')" class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[#FF5A4E]">+ {detail}</button>
+          <button type="button" onclick="insertTag('{source}')" class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[#FF5A4E]">+ {source}</button>
+        </div>
+      </div>
+      <textarea id="globalTemplateInput" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 leading-relaxed focus:outline-none focus:border-[#FF5A4E]"></textarea>
+      <p class="text-[11px] text-slate-400 mt-1">Available placeholders: <code class="text-emerald-400">{name}</code> (first name or "there"), <code class="text-emerald-400">{detail}</code> (job location/task), <code class="text-emerald-400">{source}</code> (Facebook / Insta).</p>
+    </div>
+
+    <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 space-y-1">
+      <div class="text-[11px] font-bold text-slate-300">Live Preview:</div>
+      <p id="templatePreview" class="text-xs text-slate-400 italic leading-relaxed"></p>
+    </div>
+
+    <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-slate-800">
+      <button type="button" onclick="resetDefaultTemplate()" class="text-xs text-slate-400 hover:text-white underline">Reset to Default</button>
+      <div class="flex gap-2">
+        <button type="button" onclick="toggleTemplate(false)" class="px-3 py-2 text-xs text-slate-400">Cancel</button>
+        <button type="button" onclick="saveGlobalTemplate()" class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold text-xs active:scale-95">Update All Leads</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- In-Browser Screenshot Scraper Modal -->
 <div id="uploadModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
@@ -160,9 +204,15 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v8"; // Upgraded to v8 with https://www.instagram.com/excitingwebsite/ added to all templates
-const PLACEHOLDER = "[place or job]";
-const IG_LINK = "https://www.instagram.com/excitingwebsite/";
+const STORE = "ew_crm_v9"; // Upgraded to v9 with in-app Global Template Editor & portfolio pitch
+const TEMPLATE_STORE = "ew_custom_template";
+
+// Default template including user's portfolio and "the website is yours" message
+const DEFAULT_TEMPLATE = `Hey {name}! Found you through that recent {detail} job that you did, looked clean. I'm starting a website business and just trying to get a bit of a portfolio together, so wanted to build one for you for free. The site is all yours either way, pulls your photos straight off your {source} so you don't have to touch anything. Let me know if you're keen!
+
+https://www.instagram.com/excitingwebsite/`;
+
+let globalTemplate = localStorage.getItem(TEMPLATE_STORE) || DEFAULT_TEMPLATE;
 
 const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
   "streamline", "solution", "leverage", "boost", "game-changer", "game changer", "next level",
@@ -179,313 +229,55 @@ const REPLIES = {
   "Follow up": "Hey! No stress but did you get a chance to look at this?",
 };
 
-const OPENERS = [
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked clean. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos straight off your Facebook or Insta so you don't have to touch anything. Let me know if you're keen!\n\n${IG_LINK}`,
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, came up really good. I'm starting a website business and wanted to build you a site for free. It syncs your photos straight off your Facebook or Insta so you don't have to update anything. Let me know what you reckon!\n\n${IG_LINK}`,
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked top quality. I'm starting a website business and wanted to build one for you for free just to get my name out. Pulls your photos straight off your social page so you don't have to touch it. Let me know if you'd be keen to have a look!\n\n${IG_LINK}`,
-];
+function buildMsg(template, first, detail, source) {
+  let greetingName = first ? first.trim() : "there";
+  let jobDetail = detail ? detail.trim() : "recent";
+  let photoSource = source || "Facebook or Insta";
 
-function draft(first, detail) {
-  const hi = first ? `Hey ${first}!` : "Hey!";
-  const d = detail || PLACEHOLDER;
-  return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d);
+  let out = template
+    .replace(/\{name\}/g, greetingName)
+    .replace(/\{detail\}/g, jobDetail)
+    .replace(/\{source\}/g, photoSource);
+
+  // If first name was empty and template had "Hey {name}!", "Hey there!" is natural.
+  return out;
 }
 
 const SEED = [
-  {
-    id: 1,
-    name: "Coast To Country Termite And Pest",
-    first: "",
-    phone: "0432 338 002",
-    email: "coasttwocountry@gmail.com",
-    trade: "pest controller",
-    detail: "Ocean Shores",
-    notes: "Ballina / Northern Rivers NSW",
-    msg: "Hey! Found you through that recent Ocean Shores job that you did, looked clean. I'm starting a website business and wanted to build one for you for free. Pulls your photos straight off your Facebook page so you don't have to touch anything. Let me know if you'd be keen to see it!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 2,
-    name: "Masterworks Rendering Services",
-    first: "Lachlan",
-    phone: "0405 358 938",
-    email: "",
-    trade: "renderer",
-    detail: "curved planter wall",
-    notes: "Sydney 2229 (Sutherland Shire)",
-    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 3,
-    name: "Lachlan Jones Painting & Decorating",
-    first: "Lachlan",
-    phone: "0403 333 497",
-    email: "",
-    trade: "painter",
-    detail: "pool and deck repaint",
-    notes: "Central Coast / Hunter. Lic 474003C",
-    msg: "Hey Lachlan! Found you through that recent pool and deck job that you did, came up super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to do anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 4,
-    name: "Chapo's Concrete",
-    first: "Ryan",
-    phone: "0411 141 081",
-    email: "",
-    trade: "concreter",
-    detail: "Two Wells basketball court",
-    notes: "Gawler / Barossa SA. BLD 278399",
-    msg: "Hey Ryan! Found you through that recent Two Wells job that you did, slab looked mint. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos straight off your Facebook or Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 5,
-    name: "Walsh Electrical",
-    first: "",
-    phone: "0423 341 124",
-    email: "info@walshlec.com",
-    trade: "electrician",
-    detail: "Upper Hunter shed wiring",
-    notes: "Scone / Upper Hunter NSW. Lic 404730C",
-    msg: "Hey! Found you through that recent Upper Hunter shed job that you did, looked really tidy. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch it. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 6,
-    name: "Advanced Roofing Services Pty Ltd",
-    first: "Michael",
-    phone: "0407 087 619",
-    email: "",
-    trade: "roofer",
-    detail: "tile roof restoration",
-    notes: "Michael Gibbs. Sydney / NSW",
-    msg: "Hey Michael! Found you through that recent tile roof restoration that you did, came up clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to have a look!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 7,
-    name: "WD Mowing Service",
-    first: "William",
-    phone: "0499 267 165",
-    email: "",
-    trade: "lawn care specialist",
-    detail: "Gatton acreage mowing",
-    notes: "Gatton / Toowoomba QLD",
-    msg: "Hey William! Found you through that recent Gatton job that you did, setup looks great. I'm starting a website business and wanted to build you a site for free so you show up on Google better. Pulls your photos straight off your Facebook so you don't have to touch anything. Let me know if you'd be keen to see it!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 8,
-    name: "Marsina Civil & Excavation",
-    first: "",
-    phone: "0406 431 318",
-    email: "",
-    trade: "earthmover",
-    detail: "driveway sensor trenching",
-    notes: "Western Sydney. 5.5T excavator + tipper wet hire",
-    msg: "Hey! Found you through that recent driveway sensor trenching job that you did, looked tidy. I'm starting a website business and wanted to build one for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 9,
-    name: "Southern Mobile Trailer Services",
-    first: "Mat",
-    phone: "0402 946 179",
-    email: "",
-    trade: "trailer mechanic",
-    detail: "mobile trailer repair",
-    notes: "Mat Nesbitt. Mobile trailer mechanic",
-    msg: "Hey Mat! Found you through that recent trailer repair job that you did. I'm starting a website business and wanted to build you a quick one-page site for free so people can tap call you straight off Google. Pulls your photos straight off your page automatically. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 10,
-    name: "Erae's Tree Lopping Service",
-    first: "David",
-    phone: "0415 216 640",
-    email: "david_erae@hotmail.com",
-    trade: "arborist",
-    detail: "Camden South tree removal",
-    notes: "Camden South NSW. 17 FB reviews",
-    msg: "Hey David! Found you through that recent Camden South tree job that you did, work looks solid. I'm starting a website business and wanted to build you a site for free that shows off your 17 Facebook reviews and photos. Let me know if you'd be keen to see it!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 11,
-    name: "Premium Waterproofing Experts",
-    first: "Elias",
-    phone: "0435 55 44 66",
-    email: "",
-    trade: "waterproofer",
-    detail: "Box Hill bathroom membrane",
-    notes: "Sydney. Retaining walls, bathrooms",
-    msg: "Hey Elias! Found you through that recent Box Hill job that you did, membrane looked super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 12,
-    name: "Iron Bark Structural Landscaping",
-    first: "Lachy",
-    phone: "0432 205 115",
-    email: "Lachy@ironbarklandscapes.com",
-    trade: "landscaper",
-    detail: "pool coping and retaining wall",
-    notes: "Newcastle & Lake Macquarie",
-    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch it. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 13,
-    name: "Absolute Render Gold Coast",
-    first: "Clint",
-    phone: "0406 930 004",
-    email: "",
-    trade: "renderer",
-    detail: "Venetian plaster feature wall",
-    notes: "Clint Crockett. Gold Coast QLD",
-    msg: "Hey Clint! Found you through that recent Venetian plaster job that you did, finish looked unreal. I'm starting a website business and wanted to build you a site for free to see what you think. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 14,
-    name: "Perri Building & Construction",
-    first: "Frank",
-    phone: "0497 761 573",
-    email: "perribuildingandconstruction@gmail.com",
-    trade: "builder",
-    detail: "Hammondville privacy wall",
-    notes: "Hammondville Sydney. Lic 489175C",
-    msg: "Hey Frank! Found you through that recent Hammondville privacy wall job that you did, came up clean. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Facebook page so you don't have to manage anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 15,
-    name: "Opal Painting",
-    first: "Alex",
-    phone: "0401 007 374",
-    email: "",
-    trade: "painter",
-    detail: "blue accent wall",
-    notes: "Sydney. Interior/exterior",
-    msg: "Hey Alex! Found you through that recent blue accent wall job that you did, looks sharp. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 16,
-    name: "Hercules Rubbish Removals",
-    first: "Jesse",
-    phone: "0451 941 864",
-    email: "",
-    trade: "rubbish removalist",
-    detail: "estate cleanout",
-    notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955",
-    msg: "Hey Jesse! Found you through that recent estate cleanout job that you did, massive effort. I'm starting a website business and wanted to build you a site for free so people can tap call you on Google. Pulls your photos straight off your Facebook so you don't have to touch anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 17,
-    name: "JD Engineering Works",
-    first: "Joss",
-    phone: "0478 584 837",
-    email: "",
-    trade: "aluminium fabricator",
-    detail: "tipper hungry boards",
-    notes: "Melbourne VIC. Tipper hungry boards",
-    msg: "Hey Joss! Found you through that recent tipper hungry boards job that you did, looks top quality. I'm starting a website business and wanted to build you a site for free. Pulls your build photos straight off your page automatically. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 18,
-    name: "Jake's Tree Services",
-    first: "Jake",
-    phone: "0411 092 983",
-    email: "",
-    trade: "tree lopper",
-    detail: "tree lopping and stump grind",
-    notes: "NSW. Tree lopping, stump grinding",
-    msg: "Hey Jake! Found you through that recent tree lopping job that you did, work looks solid. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 19,
-    name: "George's Gardening",
-    first: "George",
-    phone: "",
-    email: "george.gardening1@gmail.com",
-    trade: "gardener",
-    detail: "Rashays hedge trimming",
-    notes: "Fairfield / Western Sydney. ABN 82 326 455 924",
-    msg: "Hey George! Found you through that recent Rashays hedge trimming job that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Facebook or Insta so you don't have to update anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 20,
-    name: "Truebond Floors",
-    first: "",
-    phone: "",
-    email: "",
-    trade: "epoxy flooring specialist",
-    detail: "Prestons garage floor",
-    notes: "Prestons / Liverpool Sydney",
-    msg: "Hey! Found you through that recent Prestons garage floor job that you did, flake looked unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to have a look!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 21,
-    name: "Elite Chase & Core",
-    first: "",
-    phone: "0405 632 534",
-    email: "Elitewallchasing@outlook.com",
-    trade: "core driller",
-    detail: "wall chasing and core drilling",
-    notes: "Sydney. Wall chasing & core holes",
-    msg: "Hey! Found you through that recent wall chasing and core drilling job that you did, super clean. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to see it!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 22,
-    name: "Dee's Lawn & Landscaping",
-    first: "Dee",
-    phone: "",
-    email: "deeslawnandlandscaping@gmail.com",
-    trade: "landscaper",
-    detail: "garden turfing",
-    notes: "Sydney. Turfing and cleanup",
-    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 23,
-    name: "Condor Concrete Solutions",
-    first: "",
-    phone: "+61 478 136 422",
-    email: "",
-    trade: "concreter",
-    detail: "exposed aggregate driveway",
-    notes: "Perth WA. Exposed aggregate",
-    msg: "Hey! Found you through that recent exposed aggregate driveway job that you did, looked mint. I'm starting a website business and wanted to build one for you for free to see what you think. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 24,
-    name: "Green Acres",
-    first: "",
-    phone: "02 5564 2925",
-    email: "",
-    trade: "lawn specialist",
-    detail: "lawn scarifying and topdressing",
-    notes: "Moruya NSW / South Coast",
-    msg: "Hey! Found you through that recent lawn scarifying and topdressing job that you did, looked top notch. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 25,
-    name: "LJ Roof Maintenance & Construction",
-    first: "Luke",
-    phone: "0457 244 729",
-    email: "",
-    trade: "roofer",
-    detail: "ridge capping and gutter repair",
-    notes: "Luke. NSW. ABN 88 790 724 500",
-    msg: "Hey Luke! Found you through that recent ridge capping and gutter repair that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you think!\n\nhttps://www.instagram.com/excitingwebsite/"
-  },
-  {
-    id: 26,
-    name: "Corfe Plant Solutions Pty Ltd",
-    first: "",
-    phone: "0402 138 280",
-    email: "",
-    trade: "plant hire operator",
-    detail: "machinery hire fleet",
-    notes: "CPS Hire. Machinery & excavator hire",
-    msg: "Hey! Found you through your machinery hire fleet, looks like a great setup. I'm starting a website business and wanted to build a clean site for you for free so people can tap call you directly. Pulls your fleet photos straight off your page.\n\nhttps://www.instagram.com/excitingwebsite/"
-  }
-];
-
-let leads = JSON.parse(localStorage.getItem(STORE) || "null") || SEED.map(l => ({
+  { id: 1, name: "Coast To Country Termite And Pest", first: "", phone: "0432 338 002", email: "coasttwocountry@gmail.com", trade: "pest controller", detail: "Ocean Shores", source: "Facebook page", notes: "Ballina / Northern Rivers NSW" },
+  { id: 2, name: "Masterworks Rendering Services", first: "Lachlan", phone: "0405 358 938", email: "", trade: "renderer", detail: "curved planter wall", source: "Insta", notes: "Sydney 2229 (Sutherland Shire)" },
+  { id: 3, name: "Lachlan Jones Painting & Decorating", first: "Lachlan", phone: "0403 333 497", email: "", trade: "painter", detail: "pool and deck repaint", source: "Insta", notes: "Central Coast / Hunter. Lic 474003C" },
+  { id: 4, name: "Chapo's Concrete", first: "Ryan", phone: "0411 141 081", email: "", trade: "concreter", detail: "Two Wells basketball court", source: "Facebook or Insta", notes: "Gawler / Barossa SA. BLD 278399" },
+  { id: 5, name: "Walsh Electrical", first: "", phone: "0423 341 124", email: "info@walshlec.com", trade: "electrician", detail: "Upper Hunter shed wiring", source: "Insta", notes: "Scone / Upper Hunter NSW. Lic 404730C" },
+  { id: 6, name: "Advanced Roofing Services Pty Ltd", first: "Michael", phone: "0407 087 619", email: "", trade: "roofer", detail: "tile roof restoration", source: "Insta", notes: "Michael Gibbs. Sydney / NSW" },
+  { id: 7, name: "WD Mowing Service", first: "William", phone: "0499 267 165", email: "", trade: "lawn care specialist", detail: "Gatton acreage mowing", source: "Facebook", notes: "Gatton / Toowoomba QLD" },
+  { id: 8, name: "Marsina Civil & Excavation", first: "", phone: "0406 431 318", email: "", trade: "earthmover", detail: "driveway sensor trenching", source: "Insta", notes: "Western Sydney. 5.5T excavator + tipper wet hire" },
+  { id: 9, name: "Southern Mobile Trailer Services", first: "Mat", phone: "0402 946 179", email: "", trade: "trailer mechanic", detail: "mobile trailer repair", source: "page", notes: "Mat Nesbitt. Mobile trailer mechanic" },
+  { id: 10, name: "Erae's Tree Lopping Service", first: "David", phone: "0415 216 640", email: "david_erae@hotmail.com", trade: "arborist", detail: "Camden South tree removal", source: "Facebook page", notes: "Camden South NSW. 17 FB reviews" },
+  { id: 11, name: "Premium Waterproofing Experts", first: "Elias", phone: "0435 55 44 66", email: "", trade: "waterproofer", detail: "Box Hill bathroom membrane", source: "Insta", notes: "Sydney. Retaining walls, bathrooms" },
+  { id: 12, name: "Iron Bark Structural Landscaping", first: "Lachy", phone: "0432 205 115", email: "Lachy@ironbarklandscapes.com", trade: "landscaper", detail: "pool coping and retaining wall", source: "Insta", notes: "Newcastle & Lake Macquarie" },
+  { id: 13, name: "Absolute Render Gold Coast", first: "Clint", phone: "0406 930 004", email: "", trade: "renderer", detail: "Venetian plaster feature wall", source: "Insta", notes: "Clint Crockett. Gold Coast QLD" },
+  { id: 14, name: "Perri Building & Construction", first: "Frank", phone: "0497 761 573", email: "perribuildingandconstruction@gmail.com", trade: "builder", detail: "Hammondville privacy wall", source: "Facebook page", notes: "Hammondville Sydney. Lic 489175C" },
+  { id: 15, name: "Opal Painting", first: "Alex", phone: "0401 007 374", email: "", trade: "painter", detail: "blue accent wall", source: "Insta", notes: "Sydney. Interior/exterior" },
+  { id: 16, name: "Hercules Rubbish Removals", first: "Jesse", phone: "0451 941 864", email: "", trade: "rubbish removalist", detail: "estate cleanout", source: "Facebook", notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955" },
+  { id: 17, name: "JD Engineering Works", first: "Joss", phone: "0478 584 837", email: "", trade: "aluminium fabricator", detail: "tipper hungry boards", source: "page", notes: "Melbourne VIC. Tipper hungry boards" },
+  { id: 18, name: "Jake's Tree Services", first: "Jake", phone: "0411 092 983", email: "", trade: "tree lopper", detail: "tree lopping and stump grind", source: "Insta", notes: "NSW. Tree lopping, stump grinding" },
+  { id: 19, name: "George's Gardening", first: "George", phone: "", email: "george.gardening1@gmail.com", trade: "gardener", detail: "Rashays hedge trimming", source: "Facebook or Insta", notes: "Fairfield / Western Sydney. ABN 82 326 455 924" },
+  { id: 20, name: "Truebond Floors", first: "", phone: "", email: "", trade: "epoxy flooring specialist", detail: "Prestons garage floor", source: "Insta", notes: "Prestons / Liverpool Sydney" },
+  { id: 21, name: "Elite Chase & Core", first: "", phone: "0405 632 534", email: "Elitewallchasing@outlook.com", trade: "core driller", detail: "wall chasing and core drilling", source: "Insta", notes: "Sydney. Wall chasing & core holes" },
+  { id: 22, name: "Dee's Lawn & Landscaping", first: "Dee", phone: "", email: "deeslawnandlandscaping@gmail.com", trade: "landscaper", detail: "garden turfing", source: "Insta", notes: "Sydney. Turfing and cleanup" },
+  { id: 23, name: "Condor Concrete Solutions", first: "", phone: "+61 478 136 422", email: "", trade: "concreter", detail: "exposed aggregate driveway", source: "Insta", notes: "Perth WA. Exposed aggregate" },
+  { id: 24, name: "Green Acres", first: "", phone: "02 5564 2925", email: "", trade: "lawn specialist", detail: "lawn scarifying and topdressing", source: "Insta", notes: "Moruya NSW / South Coast" },
+  { id: 25, name: "LJ Roof Maintenance & Construction", first: "Luke", phone: "0457 244 729", email: "", trade: "roofer", detail: "ridge capping and gutter repair", source: "Insta", notes: "Luke. NSW. ABN 88 790 724 500" },
+  { id: 26, name: "Corfe Plant Solutions Pty Ltd", first: "", phone: "0402 138 280", email: "", trade: "plant hire operator", detail: "machinery hire fleet", source: "page", notes: "CPS Hire. Machinery & excavator hire" }
+].map(l => ({
   ...l,
   status: "TO_SEND",
-  sentAt: null
+  sentAt: null,
+  msg: buildMsg(globalTemplate, l.first, l.detail, l.source)
 }));
 
+let leads = JSON.parse(localStorage.getItem(STORE) || "null") || SEED;
 let filter = "TO_SEND";
 const STATUSES = { TO_SEND: "To Send", SENT: "Sent", REPLIED: "Replied", WON: "Won", DEAD: "Not interested" };
 
@@ -606,7 +398,7 @@ function render() {
       <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
         <div id="flags-${l.id}" class="flex flex-wrap gap-1">${p.map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("")}</div>
         <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
-          <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-roll</button>
+          <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-apply</button>
           
           ${sms ? `<a href="${sms}" onclick="return handleOutreach(${l.id}, 'SMS')" class="text-xs font-bold px-3 py-2 rounded-lg ${isSent ? "bg-slate-800 text-slate-300 border border-slate-700" : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"} flex items-center gap-1 active:scale-95">💬 ${isSent ? "Resend SMS" : "SMS"}</a>` : ""}
           
@@ -653,7 +445,7 @@ function find(id) { return leads.find(l => l.id === id); }
 function setField(id, field, val, redraft) {
   const l = find(id); if (!l) return;
   l[field] = val.trim();
-  if (redraft) l.msg = draft(l.first, l.detail);
+  if (redraft) l.msg = buildMsg(globalTemplate, l.first, l.detail, l.source);
   save(); render();
 }
 
@@ -666,7 +458,7 @@ function setMsg(id, val) {
 
 function reroll(id) {
   const l = find(id); if (!l) return;
-  l.msg = draft(l.first, l.detail); save(); render();
+  l.msg = buildMsg(globalTemplate, l.first, l.detail, l.source); save(); render();
 }
 
 function copy(text) {
@@ -679,6 +471,49 @@ function toast(msg, bad) {
   t.className = `fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl transition-all duration-200 z-50 ${bad ? "bg-red-500 text-white" : "bg-emerald-500 text-white"}`;
   t.style.opacity = "1";
   setTimeout(() => { t.style.opacity = "0"; }, 2000);
+}
+
+// Global Template Editor controls
+function toggleTemplate(open) {
+  const m = document.getElementById("templateModal");
+  m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
+  if (open) {
+    document.getElementById("globalTemplateInput").value = globalTemplate;
+    updateTemplatePreview();
+    document.getElementById("globalTemplateInput").oninput = updateTemplatePreview;
+  }
+}
+
+function updateTemplatePreview() {
+  const val = document.getElementById("globalTemplateInput").value;
+  document.getElementById("templatePreview").textContent = buildMsg(val, "Lachlan", "curved planter wall", "Insta");
+}
+
+function insertTag(tag) {
+  const t = document.getElementById("globalTemplateInput");
+  t.value += " " + tag;
+  updateTemplatePreview();
+}
+
+function resetDefaultTemplate() {
+  document.getElementById("globalTemplateInput").value = DEFAULT_TEMPLATE;
+  updateTemplatePreview();
+}
+
+function saveGlobalTemplate() {
+  const val = document.getElementById("globalTemplateInput").value.trim();
+  if (!val) { toast("Template cannot be empty", true); return; }
+  globalTemplate = val;
+  localStorage.setItem(TEMPLATE_STORE, globalTemplate);
+
+  // Apply new template across all leads immediately
+  leads.forEach(l => {
+    l.msg = buildMsg(globalTemplate, l.first, l.detail, l.source);
+  });
+  save();
+  render();
+  toggleTemplate(false);
+  toast("✓ Updated message across all leads!");
 }
 
 function toggleUpload(open) {
@@ -771,9 +606,10 @@ function saveScrapedLead(e) {
     email: f.email.trim(),
     trade: f.trade.trim(),
     detail: f.detail.trim(),
+    source: "Facebook or Insta",
     status: "TO_SEND",
     notes: "Scraped via phone screenshot",
-    msg: draft(f.first.trim(), f.detail.trim())
+    msg: buildMsg(globalTemplate, f.first, f.detail, "Facebook or Insta")
   };
   leads.unshift(lead);
   save(); render(); toggleUpload(false); toast("✓ Lead Added to To-Send list!");
@@ -790,9 +626,10 @@ function addLead(e) {
     email: f.email.trim(),
     trade: f.trade.trim(),
     detail: f.detail.trim(),
+    source: "Facebook or Insta",
     status: "TO_SEND",
     notes: "Added via phone",
-    msg: draft(f.first.trim(), f.detail.trim())
+    msg: buildMsg(globalTemplate, f.first, f.detail, "Facebook or Insta")
   });
   save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added to To-Send list!");
 }
