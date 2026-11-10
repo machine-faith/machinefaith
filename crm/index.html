@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Exciting Websites · Tradie Outreach</title>
+<title>Tradie Outreach · SMS & Email</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Tesseract.js runs 100% in browser: ZERO token cost, ZERO API credits -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; -webkit-tap-highlight-color: transparent; }
   textarea { resize: vertical; }
@@ -13,19 +15,21 @@
 </head>
 <body class="min-h-screen pb-20">
 
-<!-- Sticky Header -->
+<!-- Header -->
 <header class="border-b border-slate-800 bg-[#0f172a]/95 backdrop-blur sticky top-0 z-40">
   <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
     <div>
       <h1 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A4E]"></span>
-        Tradie Leads <span class="text-xs font-normal text-slate-400">· 26 Ready</span>
+        Tradie Leads <span class="text-xs font-normal text-slate-400">· SMS & Email</span>
       </h1>
-      <p class="text-[11px] text-slate-400">Short & direct · Tap Open SMS to send from your number</p>
+      <p class="text-[11px] text-slate-400">Tap 💬 SMS or ✉️ Email to send directly from your phone</p>
     </div>
     <div class="flex items-center gap-1.5">
-      <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95">📷 Drop</button>
-      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FF5A4E] text-white active:scale-95">+ Add</button>
+      <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
+        <span>📸</span> Scrape Photo
+      </button>
+      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95">+ Add</button>
     </div>
   </div>
 </header>
@@ -37,7 +41,7 @@
 
   <!-- Search & Filter bar -->
   <div class="space-y-2">
-    <input id="search" oninput="render()" placeholder="🔍 Search name, phone, trade, suburb..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF5A4E]">
+    <input id="search" oninput="render()" placeholder="🔍 Search name, phone, email, trade, suburb..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF5A4E]">
     <div id="filters" class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none"></div>
   </div>
 
@@ -55,30 +59,73 @@
 
 </main>
 
-<!-- Upload Screenshot Modal -->
+<!-- In-Browser Screenshot Scraper Modal (Runs 100% locally on phone, 0 API cost) -->
 <div id="uploadModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4 text-sm">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4 text-sm max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center">
-      <h3 class="font-bold text-base text-white">Upload Screenshot</h3>
+      <div>
+        <h3 class="font-bold text-base text-white flex items-center gap-1.5">
+          <span>📸</span> Screenshot Scraper
+        </h3>
+        <p class="text-[11px] text-slate-400">Scrapes phones & emails locally in your browser ($0 cost)</p>
+      </div>
       <button type="button" onclick="toggleUpload(false)" class="text-slate-400 text-lg">✕</button>
     </div>
-    <p class="text-xs text-slate-400">Take a screenshot on Instagram, Facebook, or Google Maps. Upload or paste it here to extract phone & details.</p>
     
-    <label class="border-2 border-dashed border-slate-700 hover:border-[#FF5A4E] rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-800/50">
-      <span class="text-2xl">📸</span>
-      <span class="text-xs font-semibold text-slate-300">Choose photo or take picture</span>
-      <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+    <label class="border-2 border-dashed border-slate-700 hover:border-[#FF5A4E] rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-800/50 transition">
+      <span class="text-3xl">📁</span>
+      <span class="text-xs font-semibold text-slate-200">Tap to upload or take photo</span>
+      <span class="text-[10px] text-slate-400">Ute signs, Google profiles, Facebook/Insta screenshots</span>
+      <input type="file" accept="image/*" class="hidden" onchange="runBrowserScraper(event)">
     </label>
 
-    <div id="imagePreview" class="hidden space-y-2">
-      <img id="previewImg" class="max-h-48 rounded-lg mx-auto border border-slate-800">
-      <p class="text-xs text-emerald-400 text-center font-medium">Image loaded! Fill quick details or tap add:</p>
+    <!-- Scraper Progress Indicator -->
+    <div id="scraperStatus" class="hidden space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
+      <div class="flex justify-between text-xs">
+        <span id="scraperLabel" class="text-slate-300 font-medium">Scanning screenshot...</span>
+        <span id="scraperPercent" class="text-emerald-400 font-bold">0%</span>
+      </div>
+      <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+        <div id="scraperBar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-200" style="width: 0%"></div>
+      </div>
     </div>
 
-    <div class="flex justify-end gap-2 pt-2">
-      <button type="button" onclick="toggleUpload(false)" class="px-3 py-2 text-slate-400">Cancel</button>
-      <button type="button" onclick="openManualWithPhoto()" class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold">Use Photo</button>
-    </div>
+    <!-- Scraped Result Review Form -->
+    <form id="scrapedForm" onsubmit="saveScrapedLead(event)" class="hidden space-y-2.5 pt-2 border-t border-slate-800">
+      <div class="text-xs font-bold text-emerald-400">✓ Data Extracted from Screenshot:</div>
+      <div>
+        <label class="text-[10px] text-slate-400">Business Name</label>
+        <input required id="scraped_name" name="name" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] text-slate-400">Phone</label>
+          <input id="scraped_phone" name="phone" placeholder="04xx xxx xxx" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        </div>
+        <div>
+          <label class="text-[10px] text-slate-400">Email</label>
+          <input id="scraped_email" name="email" placeholder="name@gmail.com" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[10px] text-slate-400">First Name (if found)</label>
+          <input id="scraped_first" name="first" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        </div>
+        <div>
+          <label class="text-[10px] text-slate-400">Trade</label>
+          <input required id="scraped_trade" name="trade" placeholder="e.g. painter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        </div>
+      </div>
+      <div>
+        <label class="text-[10px] text-slate-400">Place or Job (for icebreaker)</label>
+        <input id="scraped_detail" name="detail" placeholder="e.g. Cronulla or driveway" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="toggleUpload(false)" class="px-3 py-1.5 text-xs text-slate-400">Cancel</button>
+        <button class="px-4 py-1.5 bg-[#FF5A4E] text-white rounded-lg font-bold text-xs">Add Lead to CRM</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -86,16 +133,19 @@
 <div id="addModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
   <form onsubmit="addLead(event)" class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-3 text-sm">
     <div class="flex justify-between items-center">
-      <h3 class="font-bold text-base text-white">Add New Tradie</h3>
+      <h3 class="font-bold text-base text-white">Add Tradie</h3>
       <button type="button" onclick="toggleAdd(false)" class="text-slate-400 text-lg">✕</button>
     </div>
     <input required name="name" placeholder="Business name (e.g. Masterworks Rendering)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
     <div class="grid grid-cols-2 gap-2">
-      <input name="first" placeholder="Contact first name" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+      <input name="phone" placeholder="Phone (e.g. 0405 358 938)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+      <input name="email" placeholder="Email" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    </div>
+    <div class="grid grid-cols-2 gap-2">
+      <input name="first" placeholder="Contact name" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
       <input required name="trade" placeholder="Trade (e.g. renderer)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
     </div>
-    <input required name="handle" placeholder="Phone or @instagram" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
-    <input name="detail" placeholder="Place or job (e.g. Cronulla / curved planter wall)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    <input name="detail" placeholder="Place or job (e.g. Cronulla curved wall)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
     <div class="flex justify-end gap-2 pt-2">
       <button type="button" onclick="toggleAdd(false)" class="px-3 py-2 text-slate-400">Cancel</button>
       <button class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold">Save Lead</button>
@@ -107,7 +157,7 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v4"; // Bumped to v4 with user-calibrated concise tone
+const STORE = "ew_crm_v5"; // Upgraded to v5 with native phone/email routing + in-browser scraper
 const PLACEHOLDER = "[place or job]";
 
 const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
@@ -131,229 +181,210 @@ const OPENERS = [
   (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked top quality. I'm starting a website business and wanted to build one for you for free just to get my name out. Costs nothing to see it. Let me know if you'd be keen to have a look!`,
 ];
 
-function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
-
 function draft(first, detail) {
   const hi = first ? `Hey ${first}!` : "Hey!";
   const d = detail || PLACEHOLDER;
   return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d);
 }
 
+// 26 Leads populated with phones and emails directly from screenshots
 const SEED = [
   {
     id: 1,
     name: "Coast To Country Termite And Pest",
     first: "",
-    phone: "0432338002",
-    handle: "0432 338 002",
-    link: "tel:0432338002",
+    phone: "0432 338 002",
+    email: "coasttwocountry@gmail.com",
     trade: "pest controller",
     detail: "Ocean Shores",
-    notes: "Ballina / Northern Rivers NSW · coasttwocountry@gmail.com",
+    notes: "Ballina / Northern Rivers NSW",
     msg: "Hey! Found you through that recent Ocean Shores job that you did, looked clean. I'm starting a website business and wanted to build one for you for free. Pulls your photos across so you don't have to touch anything. Let me know if you'd be keen to see it!"
   },
   {
     id: 2,
     name: "Masterworks Rendering Services",
     first: "Lachlan",
-    phone: "0405358938",
-    handle: "0405 358 938 · @masterworks_rendering_services",
-    link: "https://www.instagram.com/masterworks_rendering_services/",
+    phone: "0405 358 938",
+    email: "",
     trade: "renderer",
     detail: "curved planter wall",
-    notes: "Sydney 2229 (Sutherland Shire). Modern facades, zero website.",
-    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your Insta photos across automatically. Let me know if you're keen!"
+    notes: "Sydney 2229 (Sutherland Shire)",
+    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 3,
     name: "Lachlan Jones Painting & Decorating",
     first: "Lachlan",
-    phone: "0403333497",
-    handle: "0403 333 497 · @lachlanjonespainting",
-    link: "https://www.instagram.com/lachlanjonespainting/",
+    phone: "0403 333 497",
+    email: "",
     trade: "painter",
     detail: "pool and deck repaint",
-    notes: "Central Coast / Hunter. Lic 474003C. Roof & driveway restoration.",
+    notes: "Central Coast / Hunter. Lic 474003C",
     msg: "Hey Lachlan! Found you through that recent pool and deck job that you did, came up super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across so you don't have to do anything. Let me know what you reckon!"
   },
   {
     id: 4,
     name: "Chapo's Concrete",
     first: "Ryan",
-    phone: "0411141081",
-    handle: "0411 141 081 · @chapos_concrete",
-    link: "https://www.instagram.com/chapos_concrete/",
+    phone: "0411 141 081",
+    email: "",
     trade: "concreter",
     detail: "Two Wells basketball court",
-    notes: "Gawler / Barossa SA. BLD 278399. Exposed agg driveways.",
+    notes: "Gawler / Barossa SA. BLD 278399",
     msg: "Hey Ryan! Found you through that recent Two Wells job that you did, slab looked mint. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 5,
     name: "Walsh Electrical",
     first: "",
-    phone: "0423341124",
-    handle: "0423 341 124 · @walsh.electrical",
-    link: "https://www.instagram.com/walsh.electrical/",
+    phone: "0423 341 124",
+    email: "info@walshlec.com",
     trade: "electrician",
     detail: "Upper Hunter shed wiring",
-    notes: "Scone / Upper Hunter NSW. Lic 404730C. info@walshlec.com.",
+    notes: "Scone / Upper Hunter NSW. Lic 404730C",
     msg: "Hey! Found you through that recent Upper Hunter shed job that you did, looked really tidy. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across so you don't have to touch it. Let me know what you reckon!"
   },
   {
     id: 6,
     name: "Advanced Roofing Services Pty Ltd",
     first: "Michael",
-    phone: "0407087619",
-    handle: "0407 087 619 · @advancedroofingservicespty",
-    link: "https://www.instagram.com/advancedroofingservicespty/",
+    phone: "0407 087 619",
+    email: "",
     trade: "roofer",
     detail: "tile roof restoration",
-    notes: "Michael Gibbs. Sydney / NSW. Roof restoration.",
+    notes: "Michael Gibbs. Sydney / NSW",
     msg: "Hey Michael! Found you through that recent tile roof restoration that you did, came up clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
   },
   {
     id: 7,
     name: "WD Mowing Service",
     first: "William",
-    phone: "0499267165",
-    handle: "0499 267 165 · @service.wdmowing",
-    link: "tel:0499267165",
+    phone: "0499 267 165",
+    email: "",
     trade: "lawn care specialist",
     detail: "Gatton acreage mowing",
-    notes: "Gatton / Toowoomba QLD. Google Maps listing has 0 website button.",
+    notes: "Gatton / Toowoomba QLD",
     msg: "Hey William! Found you through that recent Gatton job that you did, setup looks great. I'm starting a website business and wanted to build you a site for free so you show up on Google better. Let me know if you'd be keen to see it!"
   },
   {
     id: 8,
     name: "Marsina Civil & Excavation",
     first: "",
-    phone: "0406431318",
-    handle: "0406 431 318 · @marsina_excavation",
-    link: "https://www.instagram.com/marsina_excavation/",
+    phone: "0406 431 318",
+    email: "",
     trade: "earthmover",
     detail: "driveway sensor trenching",
-    notes: "Western Sydney. 5.5T excavator + tipper wet hire.",
+    notes: "Western Sydney. 5.5T excavator + tipper wet hire",
     msg: "Hey! Found you through that recent driveway sensor trenching job that you did, looked tidy. I'm starting a website business and wanted to build one for you for free. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 9,
     name: "Southern Mobile Trailer Services",
     first: "Mat",
-    phone: "0402946179",
-    handle: "0402 946 179 · @southernmobiletrailer.s",
-    link: "tel:0402946179",
+    phone: "0402 946 179",
+    email: "",
     trade: "trailer mechanic",
     detail: "mobile trailer repair",
-    notes: "Mat Nesbitt. Mobile trailer mechanic, wheel bearings, brakes.",
+    notes: "Mat Nesbitt. Mobile trailer mechanic",
     msg: "Hey Mat! Found you through that recent trailer repair job that you did. I'm starting a website business and wanted to build you a quick one-page site for free so people can tap call you straight off Google. Let me know what you reckon!"
   },
   {
     id: 10,
     name: "Erae's Tree Lopping Service",
     first: "David",
-    phone: "0415216640",
-    handle: "0415 216 640 · @d.tanielu29",
-    link: "tel:0415216640",
+    phone: "0415 216 640",
+    email: "david_erae@hotmail.com",
     trade: "arborist",
     detail: "Camden South tree removal",
-    notes: "Camden South NSW. 17 FB reviews. david_erae@hotmail.com.",
+    notes: "Camden South NSW. 17 FB reviews",
     msg: "Hey David! Found you through that recent Camden South tree job that you did, work looks solid. I'm starting a website business and wanted to build you a site for free that shows off your 17 reviews. Let me know if you'd be keen to see it!"
   },
   {
     id: 11,
     name: "Premium Waterproofing Experts",
     first: "Elias",
-    phone: "0435554466",
-    handle: "0435 55 44 66 · @premium.waterproofing.experts",
-    link: "https://www.instagram.com/premium.waterproofing.experts/",
+    phone: "0435 55 44 66",
+    email: "",
     trade: "waterproofer",
     detail: "Box Hill bathroom membrane",
-    notes: "Sydney. Retaining walls, bathrooms. Bio links to personal FB.",
+    notes: "Sydney. Retaining walls, bathrooms",
     msg: "Hey Elias! Found you through that recent Box Hill job that you did, membrane looked super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know what you reckon!"
   },
   {
     id: 12,
     name: "Iron Bark Structural Landscaping",
     first: "Lachy",
-    phone: "0432205115",
-    handle: "0432 205 115 · @ironbark_structurallandscaping",
-    link: "https://www.instagram.com/ironbark_structurallandscaping/",
+    phone: "0432 205 115",
+    email: "Lachy@ironbarklandscapes.com",
     trade: "landscaper",
     detail: "pool coping and retaining wall",
-    notes: "Newcastle & Lake Macquarie. Lachy@ironbarklandscapes.com.",
-    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your Insta photos across so you don't have to touch it. Let me know if you're keen!"
+    notes: "Newcastle & Lake Macquarie",
+    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos across so you don't have to touch it. Let me know if you're keen!"
   },
   {
     id: 13,
     name: "Absolute Render Gold Coast",
     first: "Clint",
-    phone: "0406930004",
-    handle: "0406 930 004 · @absolute_render_gold_coast",
-    link: "https://www.instagram.com/absolute_render_gold_coast/",
+    phone: "0406 930 004",
+    email: "",
     trade: "renderer",
     detail: "Venetian plaster feature wall",
-    notes: "Clint Crockett. Gold Coast QLD. 23 yrs exp. Microcement.",
+    notes: "Clint Crockett. Gold Coast QLD",
     msg: "Hey Clint! Found you through that recent Venetian plaster job that you did, finish looked unreal. I'm starting a website business and wanted to build you a site for free to see what you think. Let me know if you're keen!"
   },
   {
     id: 14,
     name: "Perri Building & Construction",
     first: "Frank",
-    phone: "0497761573",
-    handle: "0497 761 573 · perribuildingandconstruction@gmail.com",
-    link: "tel:0497761573",
+    phone: "0497 761 573",
+    email: "perribuildingandconstruction@gmail.com",
     trade: "builder",
     detail: "Hammondville privacy wall",
-    notes: "Hammondville Sydney. Lic 489175C. Facebook only.",
+    notes: "Hammondville Sydney. Lic 489175C",
     msg: "Hey Frank! Found you through that recent Hammondville privacy wall job that you did, came up clean. I'm starting a website business and wanted to build a site for you for free. Pulls your Facey posts across automatically. Let me know what you reckon!"
   },
   {
     id: 15,
     name: "Opal Painting",
     first: "Alex",
-    phone: "0401007374",
-    handle: "0401 007 374 · @opal_painting",
-    link: "https://www.instagram.com/opal_painting/",
+    phone: "0401 007 374",
+    email: "",
     trade: "painter",
     detail: "blue accent wall",
-    notes: "Sydney. Interior/exterior. Links back to FB profile.",
+    notes: "Sydney. Interior/exterior",
     msg: "Hey Alex! Found you through that recent blue accent wall job that you did, looks sharp. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 16,
     name: "Hercules Rubbish Removals",
     first: "Jesse",
-    phone: "0451941864",
-    handle: "0451 941 864",
-    link: "tel:0451941864",
+    phone: "0451 941 864",
+    email: "",
     trade: "rubbish removalist",
     detail: "estate cleanout",
-    notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955.",
+    notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955",
     msg: "Hey Jesse! Found you through that recent estate cleanout job that you did, massive effort. I'm starting a website business and wanted to build you a site for free so people can tap call you on Google. Let me know what you reckon!"
   },
   {
     id: 17,
     name: "JD Engineering Works",
     first: "Joss",
-    phone: "0478584837",
-    handle: "0478 584 837",
-    link: "tel:0478584837",
+    phone: "0478 584 837",
+    email: "",
     trade: "aluminium fabricator",
     detail: "tipper hungry boards",
-    notes: "Melbourne VIC. Tipper hungry boards, aluminium trays.",
+    notes: "Melbourne VIC. Tipper hungry boards",
     msg: "Hey Joss! Found you through that recent tipper hungry boards job that you did, looks top quality. I'm starting a website business and wanted to build you a site for free. Pulls your build photos across automatically. Let me know if you're keen!"
   },
   {
     id: 18,
     name: "Jake's Tree Services",
     first: "Jake",
-    phone: "0411092983",
-    handle: "0411 092 983 · @jakestree87",
-    link: "tel:0411092983",
+    phone: "0411 092 983",
+    email: "",
     trade: "tree lopper",
     detail: "tree lopping and stump grind",
-    notes: "NSW. Tree lopping, stump grinding. Insta page only.",
+    notes: "NSW. Tree lopping, stump grinding",
     msg: "Hey Jake! Found you through that recent tree lopping job that you did, work looks solid. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across automatically. Let me know what you reckon!"
   },
   {
@@ -361,11 +392,10 @@ const SEED = [
     name: "George's Gardening",
     first: "George",
     phone: "",
-    handle: "george.gardening1@gmail.com · @georges.gardening",
-    link: "https://www.instagram.com/georges.gardening/",
+    email: "george.gardening1@gmail.com",
     trade: "gardener",
     detail: "Rashays hedge trimming",
-    notes: "Fairfield / Western Sydney. ABN 82 326 455 924. 10+ yrs.",
+    notes: "Fairfield / Western Sydney. ABN 82 326 455 924",
     msg: "Hey George! Found you through that recent Rashays hedge trimming job that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
@@ -373,23 +403,21 @@ const SEED = [
     name: "Truebond Floors",
     first: "",
     phone: "",
-    handle: "@truebondfloors",
-    link: "https://www.instagram.com/truebondfloors/",
+    email: "",
     trade: "epoxy flooring specialist",
     detail: "Prestons garage floor",
-    notes: "Prestons / Liverpool Sydney. DMs only for quotes.",
+    notes: "Prestons / Liverpool Sydney",
     msg: "Hey! Found you through that recent Prestons garage floor job that you did, flake looked unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
   },
   {
     id: 21,
     name: "Elite Chase & Core",
     first: "",
-    phone: "0405632534",
-    handle: "0405 632 534 · @elitechaseandcore",
-    link: "https://www.instagram.com/elitechaseandcore/",
+    phone: "0405 632 534",
+    email: "Elitewallchasing@outlook.com",
     trade: "core driller",
     detail: "wall chasing and core drilling",
-    notes: "Sydney. Elitewallchasing@outlook.com. No website.",
+    notes: "Sydney. Wall chasing & core holes",
     msg: "Hey! Found you through that recent wall chasing and core drilling job that you did, super clean. I'm starting a website business and wanted to build a site for you for free. Let me know if you'd be keen to see it!"
   },
   {
@@ -397,59 +425,54 @@ const SEED = [
     name: "Dee's Lawn & Landscaping",
     first: "Dee",
     phone: "",
-    handle: "deeslawnandlandscaping@gmail.com · @deeslawnandlandscaping",
-    link: "https://www.instagram.com/deeslawnandlandscaping/",
+    email: "deeslawnandlandscaping@gmail.com",
     trade: "landscaper",
     detail: "garden turfing",
-    notes: "Sydney. Bio only links to Facebook profile.",
-    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your Insta photos across automatically. Let me know what you reckon!"
+    notes: "Sydney. Turfing and cleanup",
+    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across automatically. Let me know what you reckon!"
   },
   {
     id: 23,
     name: "Condor Concrete Solutions",
     first: "",
-    phone: "+61478136422",
-    handle: "+61 478 136 422 · @condorconcretesolutions",
-    link: "tel:+61478136422",
+    phone: "+61 478 136 422",
+    email: "",
     trade: "concreter",
     detail: "exposed aggregate driveway",
-    notes: "Perth WA. Exposed aggregate, zero website.",
+    notes: "Perth WA. Exposed aggregate",
     msg: "Hey! Found you through that recent exposed aggregate driveway job that you did, looked mint. I'm starting a website business and wanted to build one for you for free to see what you think. Let me know if you're keen!"
   },
   {
     id: 24,
     name: "Green Acres",
     first: "",
-    phone: "0255642925",
-    handle: "02 5564 2925 · @green_acres_southcoast",
-    link: "https://www.instagram.com/green_acres_southcoast/",
+    phone: "02 5564 2925",
+    email: "",
     trade: "lawn specialist",
     detail: "lawn scarifying and topdressing",
-    notes: "Moruya NSW / South Coast / ACT. Zero website.",
+    notes: "Moruya NSW / South Coast",
     msg: "Hey! Found you through that recent lawn scarifying and topdressing job that you did, looked top notch. I'm starting a website business and wanted to build a site for you for free. Let me know what you reckon!"
   },
   {
     id: 25,
     name: "LJ Roof Maintenance & Construction",
     first: "Luke",
-    phone: "0457244729",
-    handle: "0457 244 729 · @lj_roofmaintenance",
-    link: "tel:0457244729",
+    phone: "0457 244 729",
+    email: "",
     trade: "roofer",
     detail: "ridge capping and gutter repair",
-    notes: "Luke. NSW. ABN 88 790 724 500. Repointing & restoration.",
+    notes: "Luke. NSW. ABN 88 790 724 500",
     msg: "Hey Luke! Found you through that recent ridge capping and gutter repair that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Let me know what you think!"
   },
   {
     id: 26,
     name: "Corfe Plant Solutions Pty Ltd",
     first: "",
-    phone: "0402138280",
-    handle: "0402 138 280 · @corfeplantsolutions",
-    link: "tel:0402138280",
+    phone: "0402 138 280",
+    email: "",
     trade: "plant hire operator",
     detail: "machinery hire fleet",
-    notes: "CPS Hire. Machinery & excavator hire. Zero website.",
+    notes: "CPS Hire. Machinery & excavator hire",
     msg: "Hey! Found you through your machinery hire fleet, looks like a great setup. I'm starting a website business and wanted to build a clean site for you for free so people can tap call you directly. Let me know if you're keen!"
   }
 ];
@@ -475,8 +498,14 @@ function esc(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt
 
 function getSmsLink(phone, msg) {
   if (!phone) return null;
-  const cleanPhone = phone.replace(/\s+/g, "");
+  const cleanPhone = phone.replace(/[^0-9+]/g, "");
   return `sms:${cleanPhone}?&body=${encodeURIComponent(msg)}`;
+}
+
+function getEmailLink(email, first, detail, msg) {
+  if (!email) return null;
+  const subject = encodeURIComponent(`Quick question regarding your ${detail || "work"}`);
+  return `mailto:${email}?subject=${subject}&body=${encodeURIComponent(msg)}`;
 }
 
 function render() {
@@ -493,20 +522,21 @@ function render() {
 
   const q = document.getElementById("search").value.toLowerCase();
   const list = leads.filter(l => (filter === "ALL" || l.status === filter) &&
-    (l.name + (l.handle || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q));
+    (l.name + (l.phone || "") + (l.email || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q));
 
   document.getElementById("leads").innerHTML = list.length ? list.map(l => {
     const p = problems(l.msg);
     const sms = getSmsLink(l.phone, l.msg);
+    const email = getEmailLink(l.email, l.first, l.detail, l.msg);
     return `
     <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 space-y-3">
       <div class="flex justify-between items-start gap-2">
         <div class="min-w-0">
           <div class="font-bold text-base text-white truncate">${esc(l.name)}</div>
-          <div class="text-xs text-slate-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+          <div class="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
             <span class="text-slate-300 font-medium">${esc(l.trade)}</span>
-            ${l.phone ? `<span>·</span><a href="tel:${esc(l.phone)}" class="text-[#FF5A4E] font-medium">${esc(l.phone)}</a>` : ""}
-            ${l.link && !l.link.startsWith("tel:") ? `<span>·</span><a href="${esc(l.link)}" target="_blank" class="text-[#FF5A4E] underline text-[11px]">View Social ↗</a>` : ""}
+            ${l.phone ? `<a href="tel:${esc(l.phone.replace(/[^0-9+]/g,''))}" class="text-emerald-400 font-semibold flex items-center gap-1">📞 ${esc(l.phone)}</a>` : ""}
+            ${l.email ? `<a href="mailto:${esc(l.email)}" class="text-blue-400 font-semibold flex items-center gap-1 truncate max-w-[200px]">✉️ ${esc(l.email)}</a>` : ""}
           </div>
         </div>
         <select onchange="setField(${l.id},'status',this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-semibold text-slate-200 shrink-0">
@@ -527,7 +557,8 @@ function render() {
         <div id="flags-${l.id}" class="flex flex-wrap gap-1">${p.map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("")}</div>
         <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
           <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-roll</button>
-          ${sms ? `<a href="${sms}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 active:scale-95">💬 Open SMS</a>` : ""}
+          ${sms ? `<a href="${sms}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 active:scale-95">💬 SMS</a>` : ""}
+          ${email ? `<a href="${email}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1 active:scale-95">✉️ Email</a>` : ""}
           <button onclick="copyLead(${l.id})" class="text-xs font-bold px-3.5 py-2 rounded-lg bg-[#FF5A4E] hover:bg-[#ff4436] text-white active:scale-95">📋 Copy</button>
         </div>
       </div>
@@ -589,6 +620,10 @@ function toast(msg, bad) {
 function toggleUpload(open) {
   const m = document.getElementById("uploadModal");
   m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
+  if (!open) {
+    document.getElementById("scrapedForm").classList.add("hidden");
+    document.getElementById("scraperStatus").classList.add("hidden");
+  }
 }
 
 function toggleAdd(open) {
@@ -596,40 +631,107 @@ function toggleAdd(open) {
   m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
 }
 
-function handleImageUpload(e) {
+// In-Browser Client-Side OCR Scraper via Tesseract.js (Zero API costs, zero token burn)
+async function runBrowserScraper(e) {
   const file = e.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    document.getElementById("previewImg").src = event.target.result;
-    document.getElementById("imagePreview").classList.remove("hidden");
-  };
-  reader.readAsDataURL(file);
+
+  const statusEl = document.getElementById("scraperStatus");
+  const labelEl = document.getElementById("scraperLabel");
+  const barEl = document.getElementById("scraperBar");
+  const percentEl = document.getElementById("scraperPercent");
+  const formEl = document.getElementById("scrapedForm");
+
+  statusEl.classList.remove("hidden");
+  formEl.classList.add("hidden");
+  labelEl.textContent = "Loading OCR engine in browser...";
+  barEl.style.width = "15%";
+  percentEl.textContent = "15%";
+
+  try {
+    const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round(m.progress * 100);
+          labelEl.textContent = "Scanning screenshot for contact details...";
+          barEl.style.width = `${pct}%`;
+          percentEl.textContent = `${pct}%`;
+        }
+      }
+    });
+
+    labelEl.textContent = "Done! Extracting fields...";
+    barEl.style.width = "100%";
+    percentEl.textContent = "100%";
+
+    // Regex extraction
+    const phoneMatch = text.match(/(?:\+61|0)[23478](?:[ -]?\d){8}/);
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    
+    // Trade detection
+    const trades = ["painter", "plumber", "electrician", "sparky", "builder", "concreter", "renderer", "tiler", "carpenter", "landscaper", "gardener", "arborist", "tree lopper", "mowing", "roofing", "roofer", "waterproofing", "handyman"];
+    let detectedTrade = "tradie";
+    const lower = text.toLowerCase();
+    for (const t of trades) {
+      if (lower.includes(t)) { detectedTrade = t; break; }
+    }
+
+    // Name detection from top lines
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2 && !l.includes("http") && !l.includes("@"));
+    const businessName = lines.length ? lines[0] : "New Tradie";
+
+    document.getElementById("scraped_name").value = businessName;
+    document.getElementById("scraped_phone").value = phoneMatch ? phoneMatch[0] : "";
+    document.getElementById("scraped_email").value = emailMatch ? emailMatch[0] : "";
+    document.getElementById("scraped_trade").value = detectedTrade;
+    document.getElementById("scraped_first").value = "";
+    document.getElementById("scraped_detail").value = "";
+
+    statusEl.classList.add("hidden");
+    formEl.classList.remove("hidden");
+    toast("✓ Scraped! Review details below");
+
+  } catch (err) {
+    console.error(err);
+    labelEl.textContent = "Could not scan image automatically.";
+    statusEl.classList.add("hidden");
+    toggleUpload(false);
+    toggleAdd(true);
+  }
 }
 
-function openManualWithPhoto() {
-  toggleUpload(false);
-  toggleAdd(true);
+function saveScrapedLead(e) {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const lead = {
+    id: Date.now(),
+    name: f.name.trim(),
+    first: f.first.trim(),
+    phone: f.phone.trim(),
+    email: f.email.trim(),
+    trade: f.trade.trim(),
+    detail: f.detail.trim(),
+    status: "TO_SEND",
+    notes: "Scraped via phone screenshot",
+    msg: draft(f.first.trim(), f.detail.trim())
+  };
+  leads.unshift(lead);
+  save(); render(); toggleUpload(false); toast("✓ Lead Added to CRM!");
 }
 
 function addLead(e) {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
-  const h = f.handle.trim();
-  const cleanDigits = h.replace(/[^0-9+]/g, "");
-  const phone = cleanDigits.length >= 8 ? cleanDigits : "";
-  const link = phone ? `tel:${phone}` : h.startsWith("@") ? `https://www.instagram.com/${h.slice(1)}/` : h;
   leads.unshift({
     id: Date.now(),
     name: f.name.trim(),
     first: f.first.trim(),
-    phone,
-    handle: h,
-    link,
+    phone: f.phone.trim(),
+    email: f.email.trim(),
     trade: f.trade.trim(),
     detail: f.detail.trim(),
     status: "TO_SEND",
-    notes: "Added via mobile",
+    notes: "Added via phone",
     msg: draft(f.first.trim(), f.detail.trim())
   });
   save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added!");
