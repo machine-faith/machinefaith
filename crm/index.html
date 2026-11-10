@@ -157,7 +157,7 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v5"; // Upgraded to v5 with native phone/email routing + in-browser scraper
+const STORE = "ew_crm_v6"; // Upgraded to v6 with explicit "from your Facebook or Insta" photo source
 const PLACEHOLDER = "[place or job]";
 
 const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
@@ -176,9 +176,9 @@ const REPLIES = {
 };
 
 const OPENERS = [
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked clean. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos across automatically so you don't have to touch anything. Let me know if you're keen!`,
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, came up really good. I'm starting a website business and wanted to build you a site for free. It syncs your photos across so you don't have to update anything. Let me know what you reckon!`,
-  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked top quality. I'm starting a website business and wanted to build one for you for free just to get my name out. Costs nothing to see it. Let me know if you'd be keen to have a look!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked clean. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos straight off your Facebook or Insta so you don't have to touch anything. Let me know if you're keen!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, came up really good. I'm starting a website business and wanted to build you a site for free. It syncs your photos straight off your Facebook or Insta so you don't have to update anything. Let me know what you reckon!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked top quality. I'm starting a website business and wanted to build one for you for free just to get my name out. Pulls your photos straight off your social page so you don't have to touch it. Let me know if you'd be keen to have a look!`,
 ];
 
 function draft(first, detail) {
@@ -187,7 +187,6 @@ function draft(first, detail) {
   return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d);
 }
 
-// 26 Leads populated with phones and emails directly from screenshots
 const SEED = [
   {
     id: 1,
@@ -198,7 +197,7 @@ const SEED = [
     trade: "pest controller",
     detail: "Ocean Shores",
     notes: "Ballina / Northern Rivers NSW",
-    msg: "Hey! Found you through that recent Ocean Shores job that you did, looked clean. I'm starting a website business and wanted to build one for you for free. Pulls your photos across so you don't have to touch anything. Let me know if you'd be keen to see it!"
+    msg: "Hey! Found you through that recent Ocean Shores job that you did, looked clean. I'm starting a website business and wanted to build one for you for free. Pulls your photos straight off your Facebook page so you don't have to touch anything. Let me know if you'd be keen to see it!"
   },
   {
     id: 2,
@@ -209,7 +208,7 @@ const SEED = [
     trade: "renderer",
     detail: "curved planter wall",
     notes: "Sydney 2229 (Sutherland Shire)",
-    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos across automatically. Let me know if you're keen!"
+    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 3,
@@ -220,7 +219,7 @@ const SEED = [
     trade: "painter",
     detail: "pool and deck repaint",
     notes: "Central Coast / Hunter. Lic 474003C",
-    msg: "Hey Lachlan! Found you through that recent pool and deck job that you did, came up super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across so you don't have to do anything. Let me know what you reckon!"
+    msg: "Hey Lachlan! Found you through that recent pool and deck job that you did, came up super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to do anything. Let me know what you reckon!"
   },
   {
     id: 4,
@@ -231,7 +230,7 @@ const SEED = [
     trade: "concreter",
     detail: "Two Wells basketball court",
     notes: "Gawler / Barossa SA. BLD 278399",
-    msg: "Hey Ryan! Found you through that recent Two Wells job that you did, slab looked mint. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos across automatically. Let me know if you're keen!"
+    msg: "Hey Ryan! Found you through that recent Two Wells job that you did, slab looked mint. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos straight off your Facebook or Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 5,
@@ -242,7 +241,7 @@ const SEED = [
     trade: "electrician",
     detail: "Upper Hunter shed wiring",
     notes: "Scone / Upper Hunter NSW. Lic 404730C",
-    msg: "Hey! Found you through that recent Upper Hunter shed job that you did, looked really tidy. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across so you don't have to touch it. Let me know what you reckon!"
+    msg: "Hey! Found you through that recent Upper Hunter shed job that you did, looked really tidy. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch it. Let me know what you reckon!"
   },
   {
     id: 6,
@@ -253,7 +252,7 @@ const SEED = [
     trade: "roofer",
     detail: "tile roof restoration",
     notes: "Michael Gibbs. Sydney / NSW",
-    msg: "Hey Michael! Found you through that recent tile roof restoration that you did, came up clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
+    msg: "Hey Michael! Found you through that recent tile roof restoration that you did, came up clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to have a look!"
   },
   {
     id: 7,
@@ -264,7 +263,7 @@ const SEED = [
     trade: "lawn care specialist",
     detail: "Gatton acreage mowing",
     notes: "Gatton / Toowoomba QLD",
-    msg: "Hey William! Found you through that recent Gatton job that you did, setup looks great. I'm starting a website business and wanted to build you a site for free so you show up on Google better. Let me know if you'd be keen to see it!"
+    msg: "Hey William! Found you through that recent Gatton job that you did, setup looks great. I'm starting a website business and wanted to build you a site for free so you show up on Google better. Pulls your photos straight off your Facebook so you don't have to touch anything. Let me know if you'd be keen to see it!"
   },
   {
     id: 8,
@@ -275,7 +274,7 @@ const SEED = [
     trade: "earthmover",
     detail: "driveway sensor trenching",
     notes: "Western Sydney. 5.5T excavator + tipper wet hire",
-    msg: "Hey! Found you through that recent driveway sensor trenching job that you did, looked tidy. I'm starting a website business and wanted to build one for you for free. Pulls your photos across automatically. Let me know if you're keen!"
+    msg: "Hey! Found you through that recent driveway sensor trenching job that you did, looked tidy. I'm starting a website business and wanted to build one for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 9,
@@ -286,7 +285,7 @@ const SEED = [
     trade: "trailer mechanic",
     detail: "mobile trailer repair",
     notes: "Mat Nesbitt. Mobile trailer mechanic",
-    msg: "Hey Mat! Found you through that recent trailer repair job that you did. I'm starting a website business and wanted to build you a quick one-page site for free so people can tap call you straight off Google. Let me know what you reckon!"
+    msg: "Hey Mat! Found you through that recent trailer repair job that you did. I'm starting a website business and wanted to build you a quick one-page site for free so people can tap call you straight off Google. Pulls your photos straight off your page automatically. Let me know what you reckon!"
   },
   {
     id: 10,
@@ -297,7 +296,7 @@ const SEED = [
     trade: "arborist",
     detail: "Camden South tree removal",
     notes: "Camden South NSW. 17 FB reviews",
-    msg: "Hey David! Found you through that recent Camden South tree job that you did, work looks solid. I'm starting a website business and wanted to build you a site for free that shows off your 17 reviews. Let me know if you'd be keen to see it!"
+    msg: "Hey David! Found you through that recent Camden South tree job that you did, work looks solid. I'm starting a website business and wanted to build you a site for free that shows off your 17 Facebook reviews and photos. Let me know if you'd be keen to see it!"
   },
   {
     id: 11,
@@ -308,7 +307,7 @@ const SEED = [
     trade: "waterproofer",
     detail: "Box Hill bathroom membrane",
     notes: "Sydney. Retaining walls, bathrooms",
-    msg: "Hey Elias! Found you through that recent Box Hill job that you did, membrane looked super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know what you reckon!"
+    msg: "Hey Elias! Found you through that recent Box Hill job that you did, membrane looked super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!"
   },
   {
     id: 12,
@@ -319,7 +318,7 @@ const SEED = [
     trade: "landscaper",
     detail: "pool coping and retaining wall",
     notes: "Newcastle & Lake Macquarie",
-    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos across so you don't have to touch it. Let me know if you're keen!"
+    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch it. Let me know if you're keen!"
   },
   {
     id: 13,
@@ -330,7 +329,7 @@ const SEED = [
     trade: "renderer",
     detail: "Venetian plaster feature wall",
     notes: "Clint Crockett. Gold Coast QLD",
-    msg: "Hey Clint! Found you through that recent Venetian plaster job that you did, finish looked unreal. I'm starting a website business and wanted to build you a site for free to see what you think. Let me know if you're keen!"
+    msg: "Hey Clint! Found you through that recent Venetian plaster job that you did, finish looked unreal. I'm starting a website business and wanted to build you a site for free to see what you think. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 14,
@@ -341,7 +340,7 @@ const SEED = [
     trade: "builder",
     detail: "Hammondville privacy wall",
     notes: "Hammondville Sydney. Lic 489175C",
-    msg: "Hey Frank! Found you through that recent Hammondville privacy wall job that you did, came up clean. I'm starting a website business and wanted to build a site for you for free. Pulls your Facey posts across automatically. Let me know what you reckon!"
+    msg: "Hey Frank! Found you through that recent Hammondville privacy wall job that you did, came up clean. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Facebook page so you don't have to manage anything. Let me know what you reckon!"
   },
   {
     id: 15,
@@ -352,7 +351,7 @@ const SEED = [
     trade: "painter",
     detail: "blue accent wall",
     notes: "Sydney. Interior/exterior",
-    msg: "Hey Alex! Found you through that recent blue accent wall job that you did, looks sharp. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos across automatically. Let me know if you're keen!"
+    msg: "Hey Alex! Found you through that recent blue accent wall job that you did, looks sharp. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 16,
@@ -363,7 +362,7 @@ const SEED = [
     trade: "rubbish removalist",
     detail: "estate cleanout",
     notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955",
-    msg: "Hey Jesse! Found you through that recent estate cleanout job that you did, massive effort. I'm starting a website business and wanted to build you a site for free so people can tap call you on Google. Let me know what you reckon!"
+    msg: "Hey Jesse! Found you through that recent estate cleanout job that you did, massive effort. I'm starting a website business and wanted to build you a site for free so people can tap call you on Google. Pulls your photos straight off your Facebook so you don't have to touch anything. Let me know what you reckon!"
   },
   {
     id: 17,
@@ -374,7 +373,7 @@ const SEED = [
     trade: "aluminium fabricator",
     detail: "tipper hungry boards",
     notes: "Melbourne VIC. Tipper hungry boards",
-    msg: "Hey Joss! Found you through that recent tipper hungry boards job that you did, looks top quality. I'm starting a website business and wanted to build you a site for free. Pulls your build photos across automatically. Let me know if you're keen!"
+    msg: "Hey Joss! Found you through that recent tipper hungry boards job that you did, looks top quality. I'm starting a website business and wanted to build you a site for free. Pulls your build photos straight off your page automatically. Let me know if you're keen!"
   },
   {
     id: 18,
@@ -385,7 +384,7 @@ const SEED = [
     trade: "tree lopper",
     detail: "tree lopping and stump grind",
     notes: "NSW. Tree lopping, stump grinding",
-    msg: "Hey Jake! Found you through that recent tree lopping job that you did, work looks solid. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across automatically. Let me know what you reckon!"
+    msg: "Hey Jake! Found you through that recent tree lopping job that you did, work looks solid. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!"
   },
   {
     id: 19,
@@ -396,7 +395,7 @@ const SEED = [
     trade: "gardener",
     detail: "Rashays hedge trimming",
     notes: "Fairfield / Western Sydney. ABN 82 326 455 924",
-    msg: "Hey George! Found you through that recent Rashays hedge trimming job that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you're keen!"
+    msg: "Hey George! Found you through that recent Rashays hedge trimming job that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Facebook or Insta so you don't have to update anything. Let me know if you're keen!"
   },
   {
     id: 20,
@@ -407,7 +406,7 @@ const SEED = [
     trade: "epoxy flooring specialist",
     detail: "Prestons garage floor",
     notes: "Prestons / Liverpool Sydney",
-    msg: "Hey! Found you through that recent Prestons garage floor job that you did, flake looked unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
+    msg: "Hey! Found you through that recent Prestons garage floor job that you did, flake looked unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to have a look!"
   },
   {
     id: 21,
@@ -418,7 +417,7 @@ const SEED = [
     trade: "core driller",
     detail: "wall chasing and core drilling",
     notes: "Sydney. Wall chasing & core holes",
-    msg: "Hey! Found you through that recent wall chasing and core drilling job that you did, super clean. I'm starting a website business and wanted to build a site for you for free. Let me know if you'd be keen to see it!"
+    msg: "Hey! Found you through that recent wall chasing and core drilling job that you did, super clean. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you'd be keen to see it!"
   },
   {
     id: 22,
@@ -429,7 +428,7 @@ const SEED = [
     trade: "landscaper",
     detail: "garden turfing",
     notes: "Sydney. Turfing and cleanup",
-    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across automatically. Let me know what you reckon!"
+    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!"
   },
   {
     id: 23,
@@ -440,7 +439,7 @@ const SEED = [
     trade: "concreter",
     detail: "exposed aggregate driveway",
     notes: "Perth WA. Exposed aggregate",
-    msg: "Hey! Found you through that recent exposed aggregate driveway job that you did, looked mint. I'm starting a website business and wanted to build one for you for free to see what you think. Let me know if you're keen!"
+    msg: "Hey! Found you through that recent exposed aggregate driveway job that you did, looked mint. I'm starting a website business and wanted to build one for you for free to see what you think. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know if you're keen!"
   },
   {
     id: 24,
@@ -451,7 +450,7 @@ const SEED = [
     trade: "lawn specialist",
     detail: "lawn scarifying and topdressing",
     notes: "Moruya NSW / South Coast",
-    msg: "Hey! Found you through that recent lawn scarifying and topdressing job that you did, looked top notch. I'm starting a website business and wanted to build a site for you for free. Let me know what you reckon!"
+    msg: "Hey! Found you through that recent lawn scarifying and topdressing job that you did, looked top notch. I'm starting a website business and wanted to build a site for you for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you reckon!"
   },
   {
     id: 25,
@@ -462,7 +461,7 @@ const SEED = [
     trade: "roofer",
     detail: "ridge capping and gutter repair",
     notes: "Luke. NSW. ABN 88 790 724 500",
-    msg: "Hey Luke! Found you through that recent ridge capping and gutter repair that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Let me know what you think!"
+    msg: "Hey Luke! Found you through that recent ridge capping and gutter repair that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos straight off your Insta so you don't have to touch anything. Let me know what you think!"
   },
   {
     id: 26,
@@ -473,7 +472,7 @@ const SEED = [
     trade: "plant hire operator",
     detail: "machinery hire fleet",
     notes: "CPS Hire. Machinery & excavator hire",
-    msg: "Hey! Found you through your machinery hire fleet, looks like a great setup. I'm starting a website business and wanted to build a clean site for you for free so people can tap call you directly. Let me know if you're keen!"
+    msg: "Hey! Found you through your machinery hire fleet, looks like a great setup. I'm starting a website business and wanted to build a clean site for you for free so people can tap call you directly. Pulls your fleet photos straight off your page. Let me know if you're keen!"
   }
 ];
 
@@ -631,7 +630,6 @@ function toggleAdd(open) {
   m.classList.toggle("hidden", !open); m.classList.toggle("flex", open);
 }
 
-// In-Browser Client-Side OCR Scraper via Tesseract.js (Zero API costs, zero token burn)
 async function runBrowserScraper(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -664,11 +662,9 @@ async function runBrowserScraper(e) {
     barEl.style.width = "100%";
     percentEl.textContent = "100%";
 
-    // Regex extraction
     const phoneMatch = text.match(/(?:\+61|0)[23478](?:[ -]?\d){8}/);
     const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
     
-    // Trade detection
     const trades = ["painter", "plumber", "electrician", "sparky", "builder", "concreter", "renderer", "tiler", "carpenter", "landscaper", "gardener", "arborist", "tree lopper", "mowing", "roofing", "roofer", "waterproofing", "handyman"];
     let detectedTrade = "tradie";
     const lower = text.toLowerCase();
@@ -676,7 +672,6 @@ async function runBrowserScraper(e) {
       if (lower.includes(t)) { detectedTrade = t; break; }
     }
 
-    // Name detection from top lines
     const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 2 && !l.includes("http") && !l.includes("@"));
     const businessName = lines.length ? lines[0] : "New Tradie";
 
