@@ -269,6 +269,92 @@
   </div>
 </div>
 
+<!-- Full Lead Profile & Contact Info Editor Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-5 space-y-4 text-sm max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+      <div>
+        <h3 id="profileTitle" class="font-bold text-base text-white flex items-center gap-2">
+          <span>👤</span> Lead Profile
+        </h3>
+        <p id="profileSubtitle" class="text-xs text-slate-400 mt-0.5">Edit phone, email, contact details & notes</p>
+      </div>
+      <button type="button" onclick="closeProfileModal()" class="text-slate-400 text-lg">✕</button>
+    </div>
+
+    <form id="profileForm" onsubmit="saveProfile(event)" class="space-y-3">
+      <input type="hidden" id="prof_id">
+
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Business Name</label>
+        <input required id="prof_name" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]">
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1">
+            <span>📞</span> Phone Number
+          </label>
+          <input id="prof_phone" placeholder="04xx xxx xxx" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-emerald-400 font-medium text-xs sm:text-sm mt-1 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1">
+            <span>✉️</span> Email Address
+          </label>
+          <input id="prof_email" placeholder="name@domain.com" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-blue-400 font-medium text-xs sm:text-sm mt-1 focus:outline-none focus:border-blue-500">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Contact First Name</label>
+          <input id="prof_first" placeholder="e.g. Lachlan" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Trade / Service</label>
+          <input id="prof_trade" placeholder="e.g. painter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Job Detail / Icebreaker</label>
+          <input id="prof_detail" placeholder="e.g. Cronulla curved wall" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300">Pipeline Status</label>
+          <select id="prof_status" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 font-semibold focus:outline-none focus:border-[#FF5A4E]">
+            <option value="TO_SEND">To Send</option>
+            <option value="SENT">Sent</option>
+            <option value="REPLIED">Replied</option>
+            <option value="WON">Won</option>
+            <option value="DEAD">Not interested</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Lead Source / Social Page</label>
+        <input id="prof_source" placeholder="e.g. Instagram, Facebook, Google Maps" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]">
+      </div>
+
+      <div>
+        <label class="text-[11px] font-semibold text-slate-300">Notes & Context</label>
+        <textarea id="prof_notes" rows="3" placeholder="e.g. Found phone on Facebook, specializes in residential, 5-star reviews on Google..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white text-xs sm:text-sm mt-1 focus:outline-none focus:border-[#FF5A4E]"></textarea>
+      </div>
+
+      <!-- Action buttons in profile -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800 gap-2">
+        <button type="button" onclick="deleteLeadFromProfile()" class="text-xs text-red-400 hover:text-red-300 font-semibold px-2 py-1">🗑️ Delete Lead</button>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeProfileModal()" class="px-3 py-2 text-xs text-slate-400">Cancel</button>
+          <button class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold text-xs active:scale-95 shadow-md shadow-[#FF5A4E]/30">Save Profile</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Toast notification -->
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
@@ -477,7 +563,10 @@ function render() {
       <div class="flex justify-between items-start gap-2">
         <div class="min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-bold text-base text-white truncate">${esc(l.name)}</span>
+            <button onclick="openProfileModal(${l.id})" class="font-bold text-base text-white hover:text-[#FF5A4E] text-left truncate flex items-center gap-1.5 transition">
+              <span>${esc(l.name)}</span>
+              <span class="text-xs text-slate-400 font-normal">✏️</span>
+            </button>
             ${isReplied 
               ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold">💬 Replied</span>` 
               : isSent 
@@ -486,14 +575,23 @@ function render() {
           </div>
           <div class="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-1">
             <span class="text-slate-300 font-medium">${esc(l.trade)}</span>
-            ${l.phone ? `<a href="tel:${esc(l.phone.replace(/[^0-9+]/g,''))}" class="text-emerald-400 font-semibold flex items-center gap-1">📞 ${esc(l.phone)}</a>` : ""}
-            ${l.email ? `<a href="mailto:${esc(l.email)}" class="text-blue-400 font-semibold flex items-center gap-1 truncate max-w-[200px]">✉️ ${esc(l.email)}</a>` : ""}
+            ${l.phone 
+              ? `<a href="tel:${esc(l.phone.replace(/[^0-9+]/g,''))}" class="text-emerald-400 font-semibold flex items-center gap-1">📞 ${esc(l.phone)}</a>` 
+              : `<button onclick="openProfileModal(${l.id})" class="text-amber-400 font-bold text-[11px] flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30 active:scale-95 transition">+ Add Phone</button>`}
+            ${l.email 
+              ? `<a href="mailto:${esc(l.email)}" class="text-blue-400 font-semibold flex items-center gap-1 truncate max-w-[200px]">✉️ ${esc(l.email)}</a>` 
+              : `<button onclick="openProfileModal(${l.id})" class="text-blue-400 font-bold text-[11px] flex items-center gap-1 bg-blue-500/10 hover:bg-blue-500/20 px-2 py-0.5 rounded-md border border-blue-500/30 active:scale-95 transition">+ Add Email</button>`}
           </div>
         </div>
         
-        <select onchange="setStatus(${l.id}, this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-bold text-slate-200 shrink-0">
-          ${Object.entries(STATUSES).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}
-        </select>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="openProfileModal(${l.id})" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1 active:scale-95" title="View & Edit Full Profile">
+            <span>👤</span> Profile
+          </button>
+          <select onchange="setStatus(${l.id}, this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-bold text-slate-200">
+            ${Object.entries(STATUSES).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}
+          </select>
+        </div>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
@@ -656,6 +754,74 @@ function sendReplySms() {
     window.location.href = `sms:${cleanPhone}?&body=${encodeURIComponent(out)}`;
   }
   toast("✓ Response logged & opening SMS!");
+}
+
+// Full Profile Modal controls
+function openProfileModal(id) {
+  const l = find(id);
+  if (!l) return;
+  document.getElementById("prof_id").value = l.id;
+  document.getElementById("profileTitle").innerHTML = `<span>👤</span> ${esc(l.name)}`;
+  document.getElementById("profileSubtitle").textContent = `${l.trade || "Tradie"} · Status: ${STATUSES[l.status] || l.status}`;
+  document.getElementById("prof_name").value = l.name || "";
+  document.getElementById("prof_phone").value = l.phone || "";
+  document.getElementById("prof_email").value = l.email || "";
+  document.getElementById("prof_first").value = l.first || "";
+  document.getElementById("prof_trade").value = l.trade || "";
+  document.getElementById("prof_detail").value = l.detail || "";
+  document.getElementById("prof_status").value = l.status || "TO_SEND";
+  document.getElementById("prof_source").value = l.source || "";
+  document.getElementById("prof_notes").value = l.notes || "";
+  
+  const m = document.getElementById("profileModal");
+  m.classList.remove("hidden"); m.classList.add("flex");
+}
+
+function closeProfileModal() {
+  const m = document.getElementById("profileModal");
+  m.classList.add("hidden"); m.classList.remove("flex");
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  const id = Number(document.getElementById("prof_id").value);
+  const l = find(id);
+  if (!l) return;
+
+  const oldFirst = l.first;
+  const oldDetail = l.detail;
+
+  l.name = document.getElementById("prof_name").value.trim();
+  l.phone = document.getElementById("prof_phone").value.trim();
+  l.email = document.getElementById("prof_email").value.trim();
+  l.first = document.getElementById("prof_first").value.trim();
+  l.trade = document.getElementById("prof_trade").value.trim();
+  l.detail = document.getElementById("prof_detail").value.trim();
+  l.status = document.getElementById("prof_status").value;
+  l.source = document.getElementById("prof_source").value.trim();
+  l.notes = document.getElementById("prof_notes").value.trim();
+
+  // If first name or detail changed, re-apply template so greeting & context stay updated
+  if (l.first !== oldFirst || l.detail !== oldDetail) {
+    l.msg = buildMsg(globalTemplate, l.first, l.detail, l.source);
+  }
+
+  save();
+  render();
+  closeProfileModal();
+  toast("✓ Profile updated for " + l.name + "!");
+}
+
+function deleteLeadFromProfile() {
+  const id = Number(document.getElementById("prof_id").value);
+  const l = find(id);
+  if (!l) return;
+  if (!confirm(`Are you sure you want to delete ${l.name}?`)) return;
+  leads = leads.filter(x => x.id !== id);
+  save();
+  render();
+  closeProfileModal();
+  toast("✓ Lead deleted");
 }
 
 // Global Template Editor controls
