@@ -21,7 +21,7 @@
         <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A4E]"></span>
         Tradie Leads <span class="text-xs font-normal text-slate-400">· 26 Ready</span>
       </h1>
-      <p class="text-[11px] text-slate-400">Nash tone · $0 build / $99 mo · Tap SMS to open Messages</p>
+      <p class="text-[11px] text-slate-400">Short & direct · Tap Open SMS to send from your number</p>
     </div>
     <div class="flex items-center gap-1.5">
       <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95">📷 Drop</button>
@@ -95,7 +95,7 @@
       <input required name="trade" placeholder="Trade (e.g. renderer)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
     </div>
     <input required name="handle" placeholder="Phone or @instagram" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
-    <input name="detail" placeholder="Job photo detail (e.g. curved planter wall render)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
+    <input name="detail" placeholder="Place or job (e.g. Cronulla / curved planter wall)" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white">
     <div class="flex justify-end gap-2 pt-2">
       <button type="button" onclick="toggleAdd(false)" class="px-3 py-2 text-slate-400">Cancel</button>
       <button class="px-4 py-2 bg-[#FF5A4E] text-white rounded-lg font-bold">Save Lead</button>
@@ -107,12 +107,12 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v3";
-const PLACEHOLDER = "[something from their page]";
+const STORE = "ew_crm_v4"; // Bumped to v4 with user-calibrated concise tone
+const PLACEHOLDER = "[place or job]";
 
 const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
   "streamline", "solution", "leverage", "boost", "game-changer", "game changer", "next level",
-  "hope this finds you well", "touch base", "circle back", "cutting-edge", "robust", "tailored", "unlock"];
+  "funny enough", "hope this finds you well", "touch base", "circle back", "cutting-edge", "robust", "tailored", "unlock"];
 
 const REPLIES = {
   "Pricing?": "Yeah so the build's free, you see it before paying anything. If you want me to host it, keep it secure, sync your posts and sort the quote form alerts it's $99/mo and I can do the first month free so you can see if it's even worth it. You'd grab the domain yourself so it's in your name, only like $20-25 a year.",
@@ -126,24 +126,17 @@ const REPLIES = {
 };
 
 const OPENERS = [
-  (hi, d, t) => `${hi} Was just looking at your page, ${d} looks really good. Noticed you don't have a website linked anywhere. I build sites for ${t} that pull your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!`,
-  (hi, d, t) => `${hi} Came across your page, love ${d}. Do you have a website at all? I make sites for local businesses that sync with your Insta or Facey so you don't have to update anything. I can mock one up for free if you want to have a look. Let me know what you reckon!`,
-  (hi, d, t) => `${hi} ${cap(d)} came up really clean. Not sure if you've thought about a website but I build them for ${t} and they copy your posts across automatically. Keen to have a go at one for you, costs nothing to see it. No worries if you're flat out!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked clean. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos across automatically so you don't have to touch anything. Let me know if you're keen!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, came up really good. I'm starting a website business and wanted to build you a site for free. It syncs your photos across so you don't have to update anything. Let me know what you reckon!`,
+  (hi, d) => `${hi} Found you through that recent ${d} job that you did, looked top quality. I'm starting a website business and wanted to build one for you for free just to get my name out. Costs nothing to see it. Let me know if you'd be keen to have a look!`,
 ];
 
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 
-function draft(first, detail, trade) {
+function draft(first, detail) {
   const hi = first ? `Hey ${first}!` : "Hey!";
   const d = detail || PLACEHOLDER;
-  return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d, plural(trade));
-}
-
-function plural(trade) {
-  const t = (trade || "tradie").toLowerCase().trim();
-  if (t.endsWith("man")) return t.slice(0, -3) + "men";
-  if (t.endsWith("s")) return t;
-  return t + "s";
+  return OPENERS[Math.floor(Math.random() * OPENERS.length)](hi, d);
 }
 
 const SEED = [
@@ -155,9 +148,9 @@ const SEED = [
     handle: "0432 338 002",
     link: "tel:0432338002",
     trade: "pest controller",
-    detail: "that termite management install in Ocean Shores",
-    notes: "Ballina / Northern Rivers NSW · coasttwocountry@gmail.com · Twin name with Coast 2 Country Air!",
-    msg: "Hey! Was just looking at your page, that termite management install in Ocean Shores looked super clean. Funny enough I actually just built coast2country-air.vercel.app for Nash on the Central Coast haha. Noticed you don't have a website linked anywhere. I build sites for pest controllers that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!"
+    detail: "Ocean Shores",
+    notes: "Ballina / Northern Rivers NSW · coasttwocountry@gmail.com",
+    msg: "Hey! Found you through that recent Ocean Shores job that you did, looked clean. I'm starting a website business and wanted to build one for you for free. Pulls your photos across so you don't have to touch anything. Let me know if you'd be keen to see it!"
   },
   {
     id: 2,
@@ -167,9 +160,9 @@ const SEED = [
     handle: "0405 358 938 · @masterworks_rendering_services",
     link: "https://www.instagram.com/masterworks_rendering_services/",
     trade: "renderer",
-    detail: "that curved planter wall render",
+    detail: "curved planter wall",
     notes: "Sydney 2229 (Sutherland Shire). Modern facades, zero website.",
-    msg: "Hey Lachlan! Was just looking at your page, that curved planter wall render looked unreal. Noticed you don't have a website linked anywhere. I build sites for renderers that pull your Insta posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+    msg: "Hey Lachlan! Found you through that recent curved planter wall job that you did, looked unreal. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your Insta photos across automatically. Let me know if you're keen!"
   },
   {
     id: 3,
@@ -179,9 +172,9 @@ const SEED = [
     handle: "0403 333 497 · @lachlanjonespainting",
     link: "https://www.instagram.com/lachlanjonespainting/",
     trade: "painter",
-    detail: "that pool and deck repaint",
+    detail: "pool and deck repaint",
     notes: "Central Coast / Hunter. Lic 474003C. Roof & driveway restoration.",
-    msg: "Hey Lachlan! Came across your page, that pool and deck paint work came up really clean. Do you have a website at all? I make sites for painters that sync with your Insta so you don't have to update anything. Happy to mock one up for you for free so you can have a look. Let me know what you reckon!"
+    msg: "Hey Lachlan! Found you through that recent pool and deck job that you did, came up super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across so you don't have to do anything. Let me know what you reckon!"
   },
   {
     id: 4,
@@ -191,9 +184,9 @@ const SEED = [
     handle: "0411 141 081 · @chapos_concrete",
     link: "https://www.instagram.com/chapos_concrete/",
     trade: "concreter",
-    detail: "that basketball court slab",
+    detail: "Two Wells basketball court",
     notes: "Gawler / Barossa SA. BLD 278399. Exposed agg driveways.",
-    msg: "Hey Ryan! Came across your page, that basketball court slab came up mint. Do you have a website at all? I make sites for concreters that sync with your Facey or Insta so you don't have to touch anything. Happy to mock one up for you for free so you can see what it looks like. Let me know what you reckon!"
+    msg: "Hey Ryan! Found you through that recent Two Wells job that you did, slab looked mint. I'm starting a website business and wanted to build one for you for free to see if you like it. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 5,
@@ -203,9 +196,9 @@ const SEED = [
     handle: "0423 341 124 · @walsh.electrical",
     link: "https://www.instagram.com/walsh.electrical/",
     trade: "electrician",
-    detail: "that rural shed wiring and switchboard upgrade",
+    detail: "Upper Hunter shed wiring",
     notes: "Scone / Upper Hunter NSW. Lic 404730C. info@walshlec.com.",
-    msg: "Hey! Was just looking at your page, that rural shed setup and switchboard upgrade looked really tidy. Noticed you don't have a website linked anywhere. I build sites for sparkies that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free and you can see what you reckon. No stress if not!"
+    msg: "Hey! Found you through that recent Upper Hunter shed job that you did, looked really tidy. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across so you don't have to touch it. Let me know what you reckon!"
   },
   {
     id: 6,
@@ -215,9 +208,9 @@ const SEED = [
     handle: "0407 087 619 · @advancedroofingservicespty",
     link: "https://www.instagram.com/advancedroofingservicespty/",
     trade: "roofer",
-    detail: "that terracotta tile roof restoration",
+    detail: "tile roof restoration",
     notes: "Michael Gibbs. Sydney / NSW. Roof restoration.",
-    msg: "Hey Michael! Came across your page, that terracotta roof restoration came up really clean. Do you have a website at all? I make sites for roofers that sync with your Insta so you don't have to update anything. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+    msg: "Hey Michael! Found you through that recent tile roof restoration that you did, came up clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
   },
   {
     id: 7,
@@ -227,9 +220,9 @@ const SEED = [
     handle: "0499 267 165 · @service.wdmowing",
     link: "tel:0499267165",
     trade: "lawn care specialist",
-    detail: "the commercial mowing setup on your ute",
+    detail: "Gatton acreage mowing",
     notes: "Gatton / Toowoomba QLD. Google Maps listing has 0 website button.",
-    msg: "Hey William! Was just looking at your page, the setup on your ute and the acreage mowing work looks top notch. Noticed on Google you don't have a website button yet. I build sites for lawn care businesses that pull your posts across automatically. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey William! Found you through that recent Gatton job that you did, setup looks great. I'm starting a website business and wanted to build you a site for free so you show up on Google better. Let me know if you'd be keen to see it!"
   },
   {
     id: 8,
@@ -239,9 +232,9 @@ const SEED = [
     handle: "0406 431 318 · @marsina_excavation",
     link: "https://www.instagram.com/marsina_excavation/",
     trade: "earthmover",
-    detail: "that trenching job for the driveway sensor installation",
+    detail: "driveway sensor trenching",
     notes: "Western Sydney. 5.5T excavator + tipper wet hire.",
-    msg: "Hey! Came across your page, that trenching job for the driveway sensor installation looked really tidy. Do you have a website at all? I build sites for excavation crews that pull your Insta posts across automatically so you don't have to update anything. Happy to have a crack at one for you for free. Let me know what you reckon!"
+    msg: "Hey! Found you through that recent driveway sensor trenching job that you did, looked tidy. I'm starting a website business and wanted to build one for you for free. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 9,
@@ -251,9 +244,9 @@ const SEED = [
     handle: "0402 946 179 · @southernmobiletrailer.s",
     link: "tel:0402946179",
     trade: "trailer mechanic",
-    detail: "your mobile trailer repair setup",
+    detail: "mobile trailer repair",
     notes: "Mat Nesbitt. Mobile trailer mechanic, wheel bearings, brakes.",
-    msg: "Hey Mat! Was just looking at your page, love the mobile trailer mechanic setup. Noticed you don't have a website linked anywhere. I build clean one-page sites for mobile trades that make it dead easy for people to tap call directly off Google. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey Mat! Found you through that recent trailer repair job that you did. I'm starting a website business and wanted to build you a quick one-page site for free so people can tap call you straight off Google. Let me know what you reckon!"
   },
   {
     id: 10,
@@ -263,9 +256,9 @@ const SEED = [
     handle: "0415 216 640 · @d.tanielu29",
     link: "tel:0415216640",
     trade: "arborist",
-    detail: "that tree removal and stump grind",
+    detail: "Camden South tree removal",
     notes: "Camden South NSW. 17 FB reviews. david_erae@hotmail.com.",
-    msg: "Hey David! Came across your page, that tree removal and stump grind work looks really solid. Noticed you've got 17 solid reviews on Facey. I make modern sites for tree loppers that showcase your reviews and pull your posts across automatically. Happy to have a crack at one for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey David! Found you through that recent Camden South tree job that you did, work looks solid. I'm starting a website business and wanted to build you a site for free that shows off your 17 reviews. Let me know if you'd be keen to see it!"
   },
   {
     id: 11,
@@ -275,9 +268,9 @@ const SEED = [
     handle: "0435 55 44 66 · @premium.waterproofing.experts",
     link: "https://www.instagram.com/premium.waterproofing.experts/",
     trade: "waterproofer",
-    detail: "that bathroom waterproofing in Box Hill",
+    detail: "Box Hill bathroom membrane",
     notes: "Sydney. Retaining walls, bathrooms. Bio links to personal FB.",
-    msg: "Hey Elias! Was just looking at your page, that bathroom membrane work in Box Hill looked really clean. Noticed your bio just points to a personal Facebook link. I build sites for waterproofers that pull your Insta posts across automatically. Keen to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey Elias! Found you through that recent Box Hill job that you did, membrane looked super clean. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know what you reckon!"
   },
   {
     id: 12,
@@ -287,9 +280,9 @@ const SEED = [
     handle: "0432 205 115 · @ironbark_structurallandscaping",
     link: "https://www.instagram.com/ironbark_structurallandscaping/",
     trade: "landscaper",
-    detail: "that pool coping and retaining wall",
+    detail: "pool coping and retaining wall",
     notes: "Newcastle & Lake Macquarie. Lachy@ironbarklandscapes.com.",
-    msg: "Hey Lachy! Came across your page, that pool coping and retaining wall came up unreal. Noticed you're just getting the Insta page rolling with no website linked. I make sites for structural landscapers that sync your posts across automatically. Happy to have a crack at one for you for free and you can see what you reckon. No worries if you're flat out!"
+    msg: "Hey Lachy! Found you through that recent pool coping and retaining wall job that you did, looks unreal. I'm starting a website business and wanted to build you a site for free. Pulls your Insta photos across so you don't have to touch it. Let me know if you're keen!"
   },
   {
     id: 13,
@@ -299,9 +292,9 @@ const SEED = [
     handle: "0406 930 004 · @absolute_render_gold_coast",
     link: "https://www.instagram.com/absolute_render_gold_coast/",
     trade: "renderer",
-    detail: "that Venetian plaster feature wall",
+    detail: "Venetian plaster feature wall",
     notes: "Clint Crockett. Gold Coast QLD. 23 yrs exp. Microcement.",
-    msg: "Hey Clint! Was just looking at your page, that Venetian plaster feature wall looked unreal. Noticed you don't have a website linked anywhere. I build sites for renderers that pull your Insta posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+    msg: "Hey Clint! Found you through that recent Venetian plaster job that you did, finish looked unreal. I'm starting a website business and wanted to build you a site for free to see what you think. Let me know if you're keen!"
   },
   {
     id: 14,
@@ -311,9 +304,9 @@ const SEED = [
     handle: "0497 761 573 · perribuildingandconstruction@gmail.com",
     link: "tel:0497761573",
     trade: "builder",
-    detail: "that privacy wall replacement in Hammondville",
+    detail: "Hammondville privacy wall",
     notes: "Hammondville Sydney. Lic 489175C. Facebook only.",
-    msg: "Hey Frank! Came across your work, that privacy wall replacement in Hammondville came up really clean. Noticed you only have a Facebook page at the moment. I build sites for builders that sync with your social posts so you don't have to manage anything. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey Frank! Found you through that recent Hammondville privacy wall job that you did, came up clean. I'm starting a website business and wanted to build a site for you for free. Pulls your Facey posts across automatically. Let me know what you reckon!"
   },
   {
     id: 15,
@@ -323,9 +316,9 @@ const SEED = [
     handle: "0401 007 374 · @opal_painting",
     link: "https://www.instagram.com/opal_painting/",
     trade: "painter",
-    detail: "that blue accent wall and interior trim",
+    detail: "blue accent wall",
     notes: "Sydney. Interior/exterior. Links back to FB profile.",
-    msg: "Hey Alex! Was just looking at your page, that blue accent wall and interior trim came up really sharp. Noticed your link just goes back to Facebook. I build sites for painters that pull your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free. Let me know what you reckon!"
+    msg: "Hey Alex! Found you through that recent blue accent wall job that you did, looks sharp. I'm starting a website business and wanted to build you a site for free to see what you reckon. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 16,
@@ -335,9 +328,9 @@ const SEED = [
     handle: "0451 941 864",
     link: "tel:0451941864",
     trade: "rubbish removalist",
-    detail: "the deceased estate cleanout",
+    detail: "estate cleanout",
     notes: "Jesse Sleiman. Sydney. ABN 57 699 209 955.",
-    msg: "Hey Jesse! Came across your page, the cleanout work you guys do is massive. Noticed you don't have a website linked anywhere. I build one-page sites for rubbish removalists that make it dead easy for people to tap call or request a quick quote. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey Jesse! Found you through that recent estate cleanout job that you did, massive effort. I'm starting a website business and wanted to build you a site for free so people can tap call you on Google. Let me know what you reckon!"
   },
   {
     id: 17,
@@ -347,9 +340,9 @@ const SEED = [
     handle: "0478 584 837",
     link: "tel:0478584837",
     trade: "aluminium fabricator",
-    detail: "those aluminium hungry boards on the tippers",
+    detail: "tipper hungry boards",
     notes: "Melbourne VIC. Tipper hungry boards, aluminium trays.",
-    msg: "Hey Joss! Was just looking at your page, those custom aluminium hungry boards for the tippers look top quality. Noticed you don't have a website linked anywhere. I build sites for fabricators that pull your build photos across automatically. Keen to have a crack at one for you for free so you can see what you reckon. No worries if you're flat out!"
+    msg: "Hey Joss! Found you through that recent tipper hungry boards job that you did, looks top quality. I'm starting a website business and wanted to build you a site for free. Pulls your build photos across automatically. Let me know if you're keen!"
   },
   {
     id: 18,
@@ -359,9 +352,9 @@ const SEED = [
     handle: "0411 092 983 · @jakestree87",
     link: "tel:0411092983",
     trade: "tree lopper",
-    detail: "that tree lopping and stump grind",
+    detail: "tree lopping and stump grind",
     notes: "NSW. Tree lopping, stump grinding. Insta page only.",
-    msg: "Hey Jake! Came across your page, that tree lopping and stump grinding work looks really solid. Noticed you don't have a website linked anywhere. I build sites for tree loppers that pull your posts across automatically so it keeps itself updated. Happy to mock one up for you for free so you can see what you reckon. Let me know if you're keen!"
+    msg: "Hey Jake! Found you through that recent tree lopping job that you did, work looks solid. I'm starting a website business and wanted to build a site for you for free. Pulls your photos across automatically. Let me know what you reckon!"
   },
   {
     id: 19,
@@ -371,9 +364,9 @@ const SEED = [
     handle: "george.gardening1@gmail.com · @georges.gardening",
     link: "https://www.instagram.com/georges.gardening/",
     trade: "gardener",
-    detail: "that commercial hedge trimming at Rashays",
+    detail: "Rashays hedge trimming",
     notes: "Fairfield / Western Sydney. ABN 82 326 455 924. 10+ yrs.",
-    msg: "Hey George! Was just looking at your page, that hedge trimming work at Rashays looked really tidy. Noticed you don't have a website linked anywhere. I build sites for gardeners that pull your Insta posts across automatically so you don't have to update anything. Happy to have a crack at one for you for free. No stress if not!"
+    msg: "Hey George! Found you through that recent Rashays hedge trimming job that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you're keen!"
   },
   {
     id: 20,
@@ -383,9 +376,9 @@ const SEED = [
     handle: "@truebondfloors",
     link: "https://www.instagram.com/truebondfloors/",
     trade: "epoxy flooring specialist",
-    detail: "that flake garage floor in Prestons",
+    detail: "Prestons garage floor",
     notes: "Prestons / Liverpool Sydney. DMs only for quotes.",
-    msg: "Hey! Came across your page, that flake garage floor in Prestons came up unreal. Noticed you just have DM for quotes in your bio with no website. I make sites for epoxy specialists that showcase your floor finishes and pull your posts across automatically. Happy to mock one up for you for free so you can see what you reckon. Let me know what you think!"
+    msg: "Hey! Found you through that recent Prestons garage floor job that you did, flake looked unreal. I'm starting a website business and wanted to build you a site for free. Pulls your photos across automatically. Let me know if you'd be keen to have a look!"
   },
   {
     id: 21,
@@ -395,9 +388,9 @@ const SEED = [
     handle: "0405 632 534 · @elitechaseandcore",
     link: "https://www.instagram.com/elitechaseandcore/",
     trade: "core driller",
-    detail: "that core drilling and wall chasing",
+    detail: "wall chasing and core drilling",
     notes: "Sydney. Elitewallchasing@outlook.com. No website.",
-    msg: "Hey! Was just looking at your page, that core drilling and wall chasing work is super clean. Noticed you don't have a website linked anywhere. I build sites for specialist trades that make it easy for builders to tap call and view your capabilities. Keen to have a go at one for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey! Found you through that recent wall chasing and core drilling job that you did, super clean. I'm starting a website business and wanted to build a site for you for free. Let me know if you'd be keen to see it!"
   },
   {
     id: 22,
@@ -407,9 +400,9 @@ const SEED = [
     handle: "deeslawnandlandscaping@gmail.com · @deeslawnandlandscaping",
     link: "https://www.instagram.com/deeslawnandlandscaping/",
     trade: "landscaper",
-    detail: "that garden turfing and cleanup",
+    detail: "garden turfing",
     notes: "Sydney. Bio only links to Facebook profile.",
-    msg: "Hey Dee! Came across your page, that turfing and garden cleanup came up really fresh. Noticed your bio only links to Facebook. I build sites for landscapers that sync your Insta posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free so you can see what you reckon. No worries if you're flat out!"
+    msg: "Hey Dee! Found you through that recent garden turfing job that you did, came up fresh. I'm starting a website business and wanted to build a site for you for free. Pulls your Insta photos across automatically. Let me know what you reckon!"
   },
   {
     id: 23,
@@ -419,9 +412,9 @@ const SEED = [
     handle: "+61 478 136 422 · @condorconcretesolutions",
     link: "tel:+61478136422",
     trade: "concreter",
-    detail: "that exposed aggregate driveway and pool surround",
+    detail: "exposed aggregate driveway",
     notes: "Perth WA. Exposed aggregate, zero website.",
-    msg: "Hey! Was just looking at your page, that exposed aggregate driveway and pool surround looked mint. Noticed you don't have a website linked anywhere. I build sites for concreters that pull your posts across automatically so it stays updated. Keen to have a go at one for you, costs nothing to see it. Let me know what you reckon!"
+    msg: "Hey! Found you through that recent exposed aggregate driveway job that you did, looked mint. I'm starting a website business and wanted to build one for you for free to see what you think. Let me know if you're keen!"
   },
   {
     id: 24,
@@ -431,9 +424,9 @@ const SEED = [
     handle: "02 5564 2925 · @green_acres_southcoast",
     link: "https://www.instagram.com/green_acres_southcoast/",
     trade: "lawn specialist",
-    detail: "that lawn scarifying and topdressing",
+    detail: "lawn scarifying and topdressing",
     notes: "Moruya NSW / South Coast / ACT. Zero website.",
-    msg: "Hey! Came across your page, that lawn scarifying and topdressing job came up unreal. Noticed you don't have a website linked anywhere. I make sites for lawn care businesses that pull your posts across automatically so you don't have to update anything. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey! Found you through that recent lawn scarifying and topdressing job that you did, looked top notch. I'm starting a website business and wanted to build a site for you for free. Let me know what you reckon!"
   },
   {
     id: 25,
@@ -443,9 +436,9 @@ const SEED = [
     handle: "0457 244 729 · @lj_roofmaintenance",
     link: "tel:0457244729",
     trade: "roofer",
-    detail: "that ridge capping and gutter repair",
+    detail: "ridge capping and gutter repair",
     notes: "Luke. NSW. ABN 88 790 724 500. Repointing & restoration.",
-    msg: "Hey Luke! Was just looking at your page, that ridge capping and gutter repair looked really tidy. Noticed you don't have a website linked anywhere. I build sites for roofers that pull your posts across automatically so it keeps itself updated. Happy to have a crack at one for you for free so you can see what you reckon. Let me know what you think!"
+    msg: "Hey Luke! Found you through that recent ridge capping and gutter repair that you did, looked really tidy. I'm starting a website business and wanted to build you a site for free. Let me know what you think!"
   },
   {
     id: 26,
@@ -455,9 +448,9 @@ const SEED = [
     handle: "0402 138 280 · @corfeplantsolutions",
     link: "tel:0402138280",
     trade: "plant hire operator",
-    detail: "your machinery hire fleet",
+    detail: "machinery hire fleet",
     notes: "CPS Hire. Machinery & excavator hire. Zero website.",
-    msg: "Hey! Came across your page, great lineup of equipment in the fleet. Noticed you don't have a website linked anywhere. I build clean one-page sites for plant hire operators that make it dead easy for contractors to tap call or check availability. Happy to mock one up for you for free so you can see what you reckon. No stress if not!"
+    msg: "Hey! Found you through your machinery hire fleet, looks like a great setup. I'm starting a website business and wanted to build a clean site for you for free so people can tap call you directly. Let me know if you're keen!"
   }
 ];
 
@@ -483,7 +476,6 @@ function esc(s) { return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt
 function getSmsLink(phone, msg) {
   if (!phone) return null;
   const cleanPhone = phone.replace(/\s+/g, "");
-  // iOS and Android compatible SMS link with encoded body
   return `sms:${cleanPhone}?&body=${encodeURIComponent(msg)}`;
 }
 
@@ -524,7 +516,7 @@ function render() {
 
       <div class="grid grid-cols-2 gap-2">
         <input value="${esc(l.first)}" onchange="setField(${l.id},'first',this.value,true)" placeholder="First name" class="bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white">
-        <input value="${esc(l.detail)}" onchange="setField(${l.id},'detail',this.value,true)" placeholder="Job detail" class="bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white">
+        <input value="${esc(l.detail)}" onchange="setField(${l.id},'detail',this.value,true)" placeholder="Place or job" class="bg-slate-800/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-white">
       </div>
 
       <textarea rows="3" oninput="setMsg(${l.id},this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs sm:text-sm leading-relaxed text-slate-200 focus:outline-none focus:border-[#FF5A4E]">${esc(l.msg)}</textarea>
@@ -553,7 +545,7 @@ function find(id) { return leads.find(l => l.id === id); }
 function setField(id, field, val, redraft) {
   const l = find(id); if (!l) return;
   l[field] = val.trim();
-  if (redraft) l.msg = draft(l.first, l.detail, l.trade);
+  if (redraft) l.msg = draft(l.first, l.detail);
   save(); render();
 }
 
@@ -566,7 +558,7 @@ function setMsg(id, val) {
 
 function reroll(id) {
   const l = find(id); if (!l) return;
-  l.msg = draft(l.first, l.detail, l.trade); save(); render();
+  l.msg = draft(l.first, l.detail); save(); render();
 }
 
 function markSent(id) {
@@ -638,7 +630,7 @@ function addLead(e) {
     detail: f.detail.trim(),
     status: "TO_SEND",
     notes: "Added via mobile",
-    msg: draft(f.first.trim(), f.detail.trim(), f.trade.trim())
+    msg: draft(f.first.trim(), f.detail.trim())
   });
   save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added!");
 }
