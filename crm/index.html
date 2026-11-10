@@ -43,7 +43,10 @@
 
   <!-- Search & Tabs -->
   <div class="space-y-2">
-    <input id="search" oninput="render()" placeholder="🔍 Search name, phone, email, trade, suburb..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF5A4E]">
+    <div class="relative">
+      <input id="search" oninput="render()" placeholder="🔍 Search phone (e.g. 0405), name, trade, email..." class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#FF5A4E] shadow-inner">
+      <span class="absolute right-3 top-3 text-[11px] text-slate-500 pointer-events-none">Instant lookup</span>
+    </div>
     <div id="filters" class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none"></div>
   </div>
 
@@ -200,11 +203,77 @@
   </form>
 </div>
 
+<!-- Log Response & Counter-Reply Modal -->
+<div id="replyModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-5 space-y-4 text-sm max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-base text-white flex items-center gap-1.5">
+          <span>📥</span> Log Response & Send Reply
+        </h3>
+        <p id="replyModalLeadInfo" class="text-xs text-slate-400 mt-0.5 font-medium"></p>
+      </div>
+      <button type="button" onclick="closeReplyModal()" class="text-slate-400 text-lg">✕</button>
+    </div>
+
+    <input type="hidden" id="replyLeadId">
+
+    <!-- Incoming message from tradie -->
+    <div>
+      <label class="text-xs font-semibold text-slate-300 block mb-1.5">What did they text back?</label>
+      <textarea id="incomingText" rows="2" placeholder="e.g. Thanks for the inquiry, but I'm okay." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-[#FF5A4E]"></textarea>
+    </div>
+
+    <!-- Quick Counter-Reply Presets -->
+    <div class="space-y-1.5">
+      <label class="text-xs font-semibold text-slate-300 block">Pick Suggested Counter-Reply:</label>
+      <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+        <button type="button" onclick="pickPresetReply('not_now')" class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-left font-medium text-slate-200 active:scale-95 transition">
+          <span class="font-bold text-emerald-400 block">👋 "All good / Not now"</span>
+          <span class="text-[10px] text-slate-400 font-normal">Free build & $99/mo seeds</span>
+        </button>
+        <button type="button" onclick="pickPresetReply('pricing')" class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-left font-medium text-slate-200 active:scale-95 transition">
+          <span class="font-bold text-emerald-400 block">💰 "Pricing / What's Catch"</span>
+          <span class="text-[10px] text-slate-400 font-normal">$0 upfront, $99/mo, 1st free</span>
+        </button>
+        <button type="button" onclick="pickPresetReply('example')" class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-left font-medium text-slate-200 active:scale-95 transition">
+          <span class="font-bold text-emerald-400 block">🔗 "Send Example"</span>
+          <span class="text-[10px] text-slate-400 font-normal">Coast 2 Country live site</span>
+        </button>
+        <button type="button" onclick="pickPresetReply('keen')" class="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-left font-medium text-slate-200 active:scale-95 transition">
+          <span class="font-bold text-emerald-400 block">🚀 "Keen / Start Build"</span>
+          <span class="text-[10px] text-slate-400 font-normal">I'll have a crack with Facey</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Your Outgoing SMS Reply -->
+    <div>
+      <div class="flex justify-between items-center mb-1">
+        <label class="text-xs font-semibold text-slate-300">Your SMS Reply to send:</label>
+        <span class="text-[10px] text-slate-400">Edit freely</span>
+      </div>
+      <textarea id="outgoingText" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-[#FF5A4E] leading-relaxed"></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-slate-800">
+      <button type="button" onclick="saveReplyLogOnly()" class="px-3 py-2 text-xs bg-slate-800 text-slate-300 rounded-lg hover:text-white">Save to Log Only</button>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeReplyModal()" class="px-3 py-2 text-xs text-slate-400">Cancel</button>
+        <button type="button" onclick="sendReplySms()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-xs active:scale-95 flex items-center gap-1 shadow-lg shadow-emerald-900/40">
+          💬 Save & Open SMS
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast notification -->
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v10"; // Upgraded to v10 with personal introduction ("It's Henry")
+const STORE = "ew_crm_v11"; // Upgraded to v11 with Instant Phone/Email Search & Interactive Reply Logger
 const TEMPLATE_STORE = "ew_custom_template_v2";
 
 // Default template with personal introduction like Nash convo, portfolio & site ownership
@@ -219,6 +288,7 @@ const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "eleva
   "funny enough", "hope this finds you well", "touch base", "circle back", "cutting-edge", "robust", "tailored", "unlock"];
 
 const REPLIES = {
+  "All good / Not now": "That's all good! Let me know if you change your mind down the track. Just so you know, the build is completely free so you get to see it working before paying anything, then just $99/mo if you ever want me to host it and sync your posts, first month free. No stress either way, all the best with the work!",
   "Pricing?": "Yeah so the build's free, you see it before paying anything. If you want me to host it, keep it secure, sync your posts and sort the quote form alerts it's $99/mo and I can do the first month free so you can see if it's even worth it. You'd grab the domain yourself so it's in your name, only like $20-25 a year.",
   "What's catch?": "No catch really haha. I'd rather you see it first than pay for something blind. If you like it we go from there, if not no worries at all.",
   "Flat out": "No stress at all! Me too haha. That's kind of the point though, once it's set up you just keep posting like normal and the site updates itself. Flick me a message whenever you get a sec.",
@@ -274,10 +344,19 @@ const SEED = [
   ...l,
   status: "TO_SEND",
   sentAt: null,
+  replies: [],
   msg: buildMsg(globalTemplate, l.first, l.detail, l.source)
 }));
 
-let leads = JSON.parse(localStorage.getItem(STORE) || "null") || SEED;
+// Load leads and ensure replies array exists on every record
+let storedRaw = localStorage.getItem(STORE) || localStorage.getItem("ew_crm_v10") || localStorage.getItem("ew_crm_v9");
+let stored = storedRaw ? JSON.parse(storedRaw) : null;
+let leads = (stored || SEED).map(l => ({
+  ...l,
+  replies: l.replies || [],
+  msg: l.msg || buildMsg(globalTemplate, l.first, l.detail, l.source)
+}));
+
 let filter = "TO_SEND";
 const STATUSES = { TO_SEND: "To Send", SENT: "Sent", REPLIED: "Replied", WON: "Won", DEAD: "Not interested" };
 
@@ -344,18 +423,28 @@ function render() {
     return `<button onclick="filter='${s}';render()" class="text-xs whitespace-nowrap font-bold px-3 py-1.5 rounded-lg transition ${active ? "bg-[#FF5A4E] text-white shadow-md shadow-[#FF5A4E]/20" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}">${label}</button>`;
   }).join("");
 
-  const q = document.getElementById("search").value.toLowerCase();
+  // Universal search: typing phone digits, email, or name searches ALL leads regardless of active tab
+  const rawQ = document.getElementById("search").value.toLowerCase().trim();
+  const cleanQ = rawQ.replace(/[^a-z0-9@.]/g, "");
+  
   const list = leads.filter(l => {
-    const matchesFilter = (filter === "ALL" || l.status === filter);
-    const matchesQuery = (l.name + (l.phone || "") + (l.email || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q);
+    const rawTarget = (l.name + " " + (l.phone || "") + " " + (l.phone ? l.phone.replace(/[^0-9]/g, "") : "") + " " + (l.email || "") + " " + (l.trade || "") + " " + (l.notes || "") + " " + (l.detail || "") + " " + (l.first || "")).toLowerCase();
+    const matchesQuery = !cleanQ || rawTarget.includes(cleanQ);
+    const matchesFilter = cleanQ ? true : (filter === "ALL" || l.status === filter);
     return matchesFilter && matchesQuery;
   });
 
-  document.getElementById("bannerText").innerHTML = filter === "TO_SEND" 
-    ? `Showing leads <strong>waiting to be contacted</strong>`
-    : filter === "SENT"
-    ? `Showing leads you already <strong>sent to</strong>`
-    : `Showing <strong>${filter}</strong> leads`;
+  if (cleanQ) {
+    document.getElementById("bannerText").innerHTML = `Found leads matching "<strong>${esc(rawQ)}</strong>" (searched all tabs) · <button onclick="document.getElementById('search').value='';render()" class="underline text-slate-400 hover:text-white">Clear</button>`;
+  } else {
+    document.getElementById("bannerText").innerHTML = filter === "TO_SEND" 
+      ? `Showing leads <strong>waiting to be contacted</strong>`
+      : filter === "SENT"
+      ? `Showing leads you already <strong>sent to</strong>`
+      : filter === "REPLIED"
+      ? `Showing leads who <strong>replied</strong>`
+      : `Showing <strong>${filter}</strong> leads`;
+  }
   document.getElementById("bannerCount").textContent = `${list.length} leads`;
 
   document.getElementById("leads").innerHTML = list.length ? list.map(l => {
@@ -363,14 +452,35 @@ function render() {
     const sms = getSmsLink(l.phone, l.msg);
     const email = getEmailLink(l.email, l.first, l.detail, l.msg);
     const isSent = l.status === "SENT";
+    const isReplied = l.status === "REPLIED";
+
+    const replyLogHtml = (l.replies && l.replies.length) ? `
+      <div class="bg-slate-950/70 border border-indigo-900/50 rounded-xl p-3 space-y-2 text-xs">
+        <div class="font-bold text-indigo-300 flex items-center justify-between">
+          <span class="flex items-center gap-1"><span>💬</span> Response Log (${l.replies.length})</span>
+          <span class="text-[10px] text-slate-500">${esc(l.replies[l.replies.length - 1].at)}</span>
+        </div>
+        ${l.replies[l.replies.length - 1].incoming ? `
+        <div class="text-emerald-300 bg-emerald-950/40 border border-emerald-900/50 rounded-lg p-2.5 text-xs leading-relaxed">
+          <span class="text-slate-400 font-semibold block text-[10px] uppercase tracking-wide">They texted:</span>
+          "${esc(l.replies[l.replies.length - 1].incoming)}"
+        </div>` : ''}
+        ${l.replies[l.replies.length - 1].replySent ? `
+        <div class="text-slate-300 bg-slate-900/90 rounded-lg p-2.5 text-xs leading-relaxed">
+          <span class="text-slate-500 font-semibold block text-[10px] uppercase tracking-wide">Your reply:</span>
+          "${esc(l.replies[l.replies.length - 1].replySent)}"
+        </div>` : ''}
+      </div>` : '';
 
     return `
-    <div class="bg-slate-900 border ${isSent ? "border-slate-800/60 opacity-80" : "border-slate-800"} rounded-xl p-4 sm:p-5 space-y-3 transition">
+    <div class="bg-slate-900 border ${isReplied ? "border-indigo-600/60 ring-1 ring-indigo-500/20" : isSent ? "border-slate-800/60 opacity-90" : "border-slate-800"} rounded-xl p-4 sm:p-5 space-y-3 transition">
       <div class="flex justify-between items-start gap-2">
         <div class="min-w-0">
           <div class="flex items-center gap-2 flex-wrap">
             <span class="font-bold text-base text-white truncate">${esc(l.name)}</span>
-            ${isSent 
+            ${isReplied 
+              ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-bold">💬 Replied</span>` 
+              : isSent 
               ? `<span class="text-[10px] bg-blue-500/20 text-blue-400 border border-blue-500/40 px-2 py-0.5 rounded-full font-bold">✓ Sent ${l.sentAt || ""}</span>` 
               : `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">● Ready To Send</span>`}
           </div>
@@ -395,9 +505,15 @@ function render() {
 
       ${l.notes ? `<div class="text-[11px] text-slate-400 bg-slate-950/60 rounded-lg px-2.5 py-1.5 border border-slate-800/70"><span class="text-slate-500 font-medium">Context: </span>${esc(l.notes)}</div>` : ''}
 
+      ${replyLogHtml}
+
       <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
         <div id="flags-${l.id}" class="flex flex-wrap gap-1">${p.map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("")}</div>
-        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+        <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end flex-wrap">
+          <button onclick="openReplyModal(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1 active:scale-95 shadow-md shadow-indigo-900/30">
+            💬 Log Reply
+          </button>
+
           <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-apply</button>
           
           ${sms ? `<a href="${sms}" onclick="return handleOutreach(${l.id}, 'SMS')" class="text-xs font-bold px-3 py-2 rounded-lg ${isSent ? "bg-slate-800 text-slate-300 border border-slate-700" : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"} flex items-center gap-1 active:scale-95">💬 ${isSent ? "Resend SMS" : "SMS"}</a>` : ""}
@@ -408,6 +524,7 @@ function render() {
         </div>
       </div>
     </div>`;
+  }).join("") : `
   }).join("") : `
     <div class="bg-slate-900/50 border border-slate-800 rounded-2xl text-center py-12 px-4 space-y-3">
       <div class="text-3xl">🎉</div>
@@ -471,6 +588,74 @@ function toast(msg, bad) {
   t.className = `fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl transition-all duration-200 z-50 ${bad ? "bg-red-500 text-white" : "bg-emerald-500 text-white"}`;
   t.style.opacity = "1";
   setTimeout(() => { t.style.opacity = "0"; }, 2000);
+}
+
+// Response Logging & Reply Modal Controls
+const PRESET_REPLIES = {
+  not_now: "That's all good! Let me know if you change your mind down the track. Just so you know, the build is completely free so you get to see it working before paying anything, then just $99/mo if you ever want me to host it and sync your posts, first month free. No stress either way, all the best with the work!",
+  pricing: "Yeah so the build's free, you see it before paying anything. If you want me to host it, keep it secure, sync your posts and sort the quote form alerts it's $99/mo and I can do the first month free so you can see if it's even worth it. You'd grab the domain yourself so it's in your name, only like $20-25 a year.",
+  example: "Yeah for sure! Here's one I just did for an air con business on the Central Coast https://coast2country-air.vercel.app/ it pulls his Facey posts in automatically. Happy to have a crack at one for you so you can see it with your stuff.",
+  keen: "Sweet! I'll have a crack at it. I'll just use some of the photos off your page but send over any others you want in there. Otherwise I'll have a go and we can tweak it after."
+};
+
+function openReplyModal(id) {
+  const l = find(id);
+  if (!l) return;
+  document.getElementById("replyLeadId").value = id;
+  document.getElementById("replyModalLeadInfo").textContent = `${l.name} · ${l.phone || "No phone"} · ${l.trade}`;
+  document.getElementById("incomingText").value = "";
+  pickPresetReply('not_now');
+  const m = document.getElementById("replyModal");
+  m.classList.remove("hidden"); m.classList.add("flex");
+}
+
+function closeReplyModal() {
+  const m = document.getElementById("replyModal");
+  m.classList.add("hidden"); m.classList.remove("flex");
+}
+
+function pickPresetReply(key) {
+  if (PRESET_REPLIES[key]) {
+    document.getElementById("outgoingText").value = PRESET_REPLIES[key];
+  }
+}
+
+function recordReply(id, incoming, outgoing) {
+  const l = find(id);
+  if (!l) return;
+  l.replies = l.replies || [];
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " today";
+  l.replies.push({
+    at: time,
+    incoming: (incoming || "").trim(),
+    replySent: (outgoing || "").trim()
+  });
+  l.status = "REPLIED";
+  save();
+  render();
+}
+
+function saveReplyLogOnly() {
+  const id = Number(document.getElementById("replyLeadId").value);
+  const inc = document.getElementById("incomingText").value;
+  const out = document.getElementById("outgoingText").value;
+  recordReply(id, inc, out);
+  closeReplyModal();
+  toast("✓ Response logged & marked Replied!");
+}
+
+function sendReplySms() {
+  const id = Number(document.getElementById("replyLeadId").value);
+  const l = find(id);
+  const inc = document.getElementById("incomingText").value;
+  const out = document.getElementById("outgoingText").value;
+  recordReply(id, inc, out);
+  closeReplyModal();
+  if (l && l.phone && out) {
+    const cleanPhone = l.phone.replace(/[^0-9+]/g, '');
+    window.location.href = `sms:${cleanPhone}?&body=${encodeURIComponent(out)}`;
+  }
+  toast("✓ Response logged & opening SMS!");
 }
 
 // Global Template Editor controls
