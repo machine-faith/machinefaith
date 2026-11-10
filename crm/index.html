@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tradie Outreach · SMS & Email</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Tesseract.js runs 100% in browser: ZERO token cost, ZERO API credits -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#0b1120; color:#f8fafc; -webkit-tap-highlight-color: transparent; }
@@ -13,17 +12,17 @@
   .flag { background: rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.3); }
 </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-24">
 
-<!-- Header -->
+<!-- Sticky Header -->
 <header class="border-b border-slate-800 bg-[#0f172a]/95 backdrop-blur sticky top-0 z-40">
   <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
     <div>
       <h1 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#FF5A4E]"></span>
-        Tradie Leads <span class="text-xs font-normal text-slate-400">· SMS & Email</span>
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        Tradie Leads <span class="text-xs font-normal text-slate-400">· Outreach Pipeline</span>
       </h1>
-      <p class="text-[11px] text-slate-400">Tap 💬 SMS or ✉️ Email to send directly from your phone</p>
+      <p class="text-[11px] text-slate-400">Auto-moves to "Sent" on click · Prevents double-sending</p>
     </div>
     <div class="flex items-center gap-1.5">
       <button onclick="toggleUpload(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
@@ -36,10 +35,10 @@
 
 <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
 
-  <!-- Stats Grid -->
+  <!-- Stats Tabs (Clicking any box filters immediately) -->
   <div class="grid grid-cols-4 gap-2 text-center" id="stats"></div>
 
-  <!-- Search & Filter bar -->
+  <!-- Search & Tabs -->
   <div class="space-y-2">
     <input id="search" oninput="render()" placeholder="🔍 Search name, phone, email, trade, suburb..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF5A4E]">
     <div id="filters" class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none"></div>
@@ -54,12 +53,18 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mt-3" id="replies"></div>
   </details>
 
+  <!-- Active Filter Notification Banner -->
+  <div id="filterBanner" class="text-xs py-2 px-3 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center text-slate-300">
+    <span id="bannerText">Showing leads <strong>To Send</strong></span>
+    <span id="bannerCount" class="font-bold text-emerald-400">0 remaining</span>
+  </div>
+
   <!-- Leads List -->
   <div id="leads" class="space-y-3"></div>
 
 </main>
 
-<!-- In-Browser Screenshot Scraper Modal (Runs 100% locally on phone, 0 API cost) -->
+<!-- In-Browser Screenshot Scraper Modal -->
 <div id="uploadModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4">
   <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-5 space-y-4 text-sm max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center">
@@ -79,7 +84,6 @@
       <input type="file" accept="image/*" class="hidden" onchange="runBrowserScraper(event)">
     </label>
 
-    <!-- Scraper Progress Indicator -->
     <div id="scraperStatus" class="hidden space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800">
       <div class="flex justify-between text-xs">
         <span id="scraperLabel" class="text-slate-300 font-medium">Scanning screenshot...</span>
@@ -90,7 +94,6 @@
       </div>
     </div>
 
-    <!-- Scraped Result Review Form -->
     <form id="scrapedForm" onsubmit="saveScrapedLead(event)" class="hidden space-y-2.5 pt-2 border-t border-slate-800">
       <div class="text-xs font-bold text-emerald-400">✓ Data Extracted from Screenshot:</div>
       <div>
@@ -157,7 +160,7 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v6"; // Upgraded to v6 with explicit "from your Facebook or Insta" photo source
+const STORE = "ew_crm_v7"; // Upgraded to v7 with bulletproof status columns & auto-sent transitions
 const PLACEHOLDER = "[place or job]";
 
 const BANNED = ["\u2014", "\u2013", "mate", "legend", "brother", "delve", "elevate", "seamless",
@@ -476,13 +479,16 @@ const SEED = [
   }
 ];
 
+// Initialize leads. Status starts at TO_SEND
 let leads = JSON.parse(localStorage.getItem(STORE) || "null") || SEED.map(l => ({
   ...l,
-  status: "TO_SEND"
+  status: "TO_SEND",
+  sentAt: null
 }));
 
-let filter = "ALL";
-const STATUSES = { TO_SEND: "To send", SENT: "Sent", REPLIED: "Replied", WON: "Won", DEAD: "Not interested" };
+// Default view is TO_SEND so user only sees what needs action!
+let filter = "TO_SEND";
+const STATUSES = { TO_SEND: "To Send", SENT: "Sent", REPLIED: "Replied", WON: "Won", DEAD: "Not interested" };
 
 function save() { localStorage.setItem(STORE, JSON.stringify(leads)); }
 
@@ -507,38 +513,93 @@ function getEmailLink(email, first, detail, msg) {
   return `mailto:${email}?subject=${subject}&body=${encodeURIComponent(msg)}`;
 }
 
-function render() {
-  const count = s => leads.filter(l => l.status === s).length;
-  document.getElementById("stats").innerHTML = [
-    ["All", leads.length, "text-white"],
-    ["To Send", count("TO_SEND"), "text-emerald-400 font-bold"],
-    ["Sent", count("SENT"), "text-blue-400 font-bold"],
-    ["Won", count("WON"), "text-amber-400 font-bold"]
-  ].map(([l, n, c]) => `<div class="bg-slate-900 border border-slate-800 rounded-xl py-2 px-1"><div class="text-[10px] text-slate-400">${l}</div><div class="text-base sm:text-lg ${c}">${n}</div></div>`).join("");
+// BULLETPROOF SEND ACTION:
+// Triggered on SMS, Email, or Copy click.
+// Instantly sets status to SENT, records timestamp, saves, and re-renders so it moves out of "To Send"
+function handleOutreach(id, channel) {
+  const l = find(id);
+  if (!l) return true;
 
-  document.getElementById("filters").innerHTML = ["ALL", ...Object.keys(STATUSES)].map(s =>
-    `<button onclick="filter='${s}';render()" class="text-xs whitespace-nowrap font-semibold px-3 py-1.5 rounded-lg transition ${filter === s ? "bg-[#FF5A4E] text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}">${s === "ALL" ? "All" : STATUSES[s]}</button>`).join("");
+  if (l.status === "SENT") {
+    const ok = confirm(`⚠️ You already sent to ${l.name} at ${l.sentAt || "earlier"}.\n\nDo you want to send again?`);
+    if (!ok) return false;
+  }
+
+  // Stamp as sent
+  l.status = "SENT";
+  l.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " today";
+  save();
+
+  // If we are on the TO_SEND view, card will disappear cleanly after slight animation
+  toast(`✓ Sent via ${channel}! Moved to "Sent" column`);
+  setTimeout(render, 400);
+  return true;
+}
+
+function render() {
+  const toSendCount = leads.filter(l => l.status === "TO_SEND").length;
+  const sentCount = leads.filter(l => l.status === "SENT").length;
+  const repliedCount = leads.filter(l => l.status === "REPLIED" || l.status === "WON").length;
+
+  // Stats boxes are clickable filters
+  document.getElementById("stats").innerHTML = [
+    ["To Send", toSendCount, "text-emerald-400 font-extrabold", "TO_SEND"],
+    ["Sent", sentCount, "text-blue-400 font-bold", "SENT"],
+    ["Replied", repliedCount, "text-amber-400 font-bold", "REPLIED"],
+    ["All Leads", leads.length, "text-white font-bold", "ALL"]
+  ].map(([l, n, c, f]) => `
+    <button onclick="filter='${f}';render()" class="bg-slate-900 border ${filter === f ? "border-[#FF5A4E] ring-1 ring-[#FF5A4E]" : "border-slate-800"} rounded-xl py-2 px-1 text-center transition active:scale-95">
+      <div class="text-[10px] text-slate-400">${l}</div>
+      <div class="text-base sm:text-lg ${c}">${n}</div>
+    </button>`).join("");
+
+  // Filter tabs
+  document.getElementById("filters").innerHTML = ["TO_SEND", "SENT", "ALL", "REPLIED", "WON"].map(s => {
+    const label = s === "ALL" ? "All" : STATUSES[s] || s;
+    const active = filter === s;
+    return `<button onclick="filter='${s}';render()" class="text-xs whitespace-nowrap font-bold px-3 py-1.5 rounded-lg transition ${active ? "bg-[#FF5A4E] text-white shadow-md shadow-[#FF5A4E]/20" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}">${label}</button>`;
+  }).join("");
 
   const q = document.getElementById("search").value.toLowerCase();
-  const list = leads.filter(l => (filter === "ALL" || l.status === filter) &&
-    (l.name + (l.phone || "") + (l.email || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q));
+  const list = leads.filter(l => {
+    const matchesFilter = (filter === "ALL" || l.status === filter);
+    const matchesQuery = (l.name + (l.phone || "") + (l.email || "") + (l.trade || "") + (l.notes || "") + (l.detail || "")).toLowerCase().includes(q);
+    return matchesFilter && matchesQuery;
+  });
+
+  // Banner count
+  document.getElementById("bannerText").innerHTML = filter === "TO_SEND" 
+    ? `Showing leads <strong>waiting to be contacted</strong>`
+    : filter === "SENT"
+    ? `Showing leads you already <strong>sent to</strong>`
+    : `Showing <strong>${filter}</strong> leads`;
+  document.getElementById("bannerCount").textContent = `${list.length} leads`;
 
   document.getElementById("leads").innerHTML = list.length ? list.map(l => {
     const p = problems(l.msg);
     const sms = getSmsLink(l.phone, l.msg);
     const email = getEmailLink(l.email, l.first, l.detail, l.msg);
+    const isSent = l.status === "SENT";
+
     return `
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-5 space-y-3">
+    <div class="bg-slate-900 border ${isSent ? "border-slate-800/60 opacity-80" : "border-slate-800"} rounded-xl p-4 sm:p-5 space-y-3 transition">
       <div class="flex justify-between items-start gap-2">
         <div class="min-w-0">
-          <div class="font-bold text-base text-white truncate">${esc(l.name)}</div>
-          <div class="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-bold text-base text-white truncate">${esc(l.name)}</span>
+            ${isSent 
+              ? `<span class="text-[10px] bg-blue-500/20 text-blue-400 border border-blue-500/40 px-2 py-0.5 rounded-full font-bold">✓ Sent ${l.sentAt || ""}</span>` 
+              : `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">● Ready To Send</span>`}
+          </div>
+          <div class="text-xs text-slate-400 flex items-center gap-2 flex-wrap mt-1">
             <span class="text-slate-300 font-medium">${esc(l.trade)}</span>
             ${l.phone ? `<a href="tel:${esc(l.phone.replace(/[^0-9+]/g,''))}" class="text-emerald-400 font-semibold flex items-center gap-1">📞 ${esc(l.phone)}</a>` : ""}
             ${l.email ? `<a href="mailto:${esc(l.email)}" class="text-blue-400 font-semibold flex items-center gap-1 truncate max-w-[200px]">✉️ ${esc(l.email)}</a>` : ""}
           </div>
         </div>
-        <select onchange="setField(${l.id},'status',this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-semibold text-slate-200 shrink-0">
+        
+        <!-- Status dropdown -->
+        <select onchange="setStatus(${l.id}, this.value)" class="bg-slate-800 border border-slate-700 rounded-lg text-xs px-2 py-1.5 font-bold text-slate-200 shrink-0">
           ${Object.entries(STATUSES).map(([k, v]) => `<option value="${k}" ${l.status === k ? "selected" : ""}>${v}</option>`).join("")}
         </select>
       </div>
@@ -556,13 +617,40 @@ function render() {
         <div id="flags-${l.id}" class="flex flex-wrap gap-1">${p.map(x => `<span class="flag text-[10px] px-1.5 py-0.5 rounded font-medium">${x}</span>`).join("")}</div>
         <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
           <button onclick="reroll(${l.id})" class="text-xs px-2.5 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95">🎲 Re-roll</button>
-          ${sms ? `<a href="${sms}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 active:scale-95">💬 SMS</a>` : ""}
-          ${email ? `<a href="${email}" onclick="markSent(${l.id})" class="text-xs font-bold px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1 active:scale-95">✉️ Email</a>` : ""}
-          <button onclick="copyLead(${l.id})" class="text-xs font-bold px-3.5 py-2 rounded-lg bg-[#FF5A4E] hover:bg-[#ff4436] text-white active:scale-95">📋 Copy</button>
+          
+          ${sms ? `<a href="${sms}" onclick="return handleOutreach(${l.id}, 'SMS')" class="text-xs font-bold px-3 py-2 rounded-lg ${isSent ? "bg-slate-800 text-slate-300 border border-slate-700" : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30"} flex items-center gap-1 active:scale-95">💬 ${isSent ? "Resend SMS" : "SMS"}</a>` : ""}
+          
+          ${email ? `<a href="${email}" onclick="return handleOutreach(${l.id}, 'Email')" class="text-xs font-bold px-3 py-2 rounded-lg ${isSent ? "bg-slate-800 text-slate-300 border border-slate-700" : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/30"} flex items-center gap-1 active:scale-95">✉️ ${isSent ? "Resend Email" : "Email"}</a>` : ""}
+          
+          <button onclick="copyAndMark(${l.id})" class="text-xs font-bold px-3.5 py-2 rounded-lg ${isSent ? "bg-slate-800 text-slate-300" : "bg-[#FF5A4E] hover:bg-[#ff4436] text-white shadow-lg shadow-[#FF5A4E]/30"} active:scale-95">📋 ${isSent ? "Copy Again" : "Copy & Mark Sent"}</button>
         </div>
       </div>
     </div>`;
-  }).join("") : `<div class="text-slate-400 text-sm text-center py-12">No leads found.</div>`;
+  }).join("") : `
+    <div class="bg-slate-900/50 border border-slate-800 rounded-2xl text-center py-12 px-4 space-y-3">
+      <div class="text-3xl">🎉</div>
+      <div class="text-base font-bold text-white">${filter === "TO_SEND" ? "All Caught Up!" : "No leads in this column"}</div>
+      <p class="text-xs text-slate-400 max-w-sm mx-auto">${filter === "TO_SEND" ? "You have messaged every lead in your To Send list. Check the Sent tab to follow up or drop more screenshots." : "Switch tabs above to view other leads."}</p>
+      ${filter === "TO_SEND" ? `<button onclick="filter='SENT';render()" class="text-xs font-bold px-4 py-2 rounded-lg bg-blue-600 text-white">View Sent Leads ↗</button>` : ""}
+    </div>`;
+}
+
+function setStatus(id, val) {
+  const l = find(id);
+  if (!l) return;
+  l.status = val;
+  if (val === "SENT" && !l.sentAt) {
+    l.sentAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " today";
+  }
+  save(); render();
+}
+
+function copyAndMark(id) {
+  const l = find(id); if (!l) return;
+  const p = problems(l.msg);
+  if (p.length) { toast("Fix first: " + p.join(", "), true); return; }
+  copy(l.msg);
+  handleOutreach(id, "Copy");
 }
 
 function renderReplies() {
@@ -589,19 +677,6 @@ function setMsg(id, val) {
 function reroll(id) {
   const l = find(id); if (!l) return;
   l.msg = draft(l.first, l.detail); save(); render();
-}
-
-function markSent(id) {
-  const l = find(id);
-  if (l && l.status === "TO_SEND") { l.status = "SENT"; save(); setTimeout(render, 500); }
-}
-
-function copyLead(id) {
-  const l = find(id); if (!l) return;
-  const p = problems(l.msg);
-  if (p.length) { toast("Fix first: " + p.join(", "), true); return; }
-  copy(l.msg);
-  markSent(id);
 }
 
 function copy(text) {
@@ -711,7 +786,7 @@ function saveScrapedLead(e) {
     msg: draft(f.first.trim(), f.detail.trim())
   };
   leads.unshift(lead);
-  save(); render(); toggleUpload(false); toast("✓ Lead Added to CRM!");
+  save(); render(); toggleUpload(false); toast("✓ Lead Added to To-Send list!");
 }
 
 function addLead(e) {
@@ -729,7 +804,7 @@ function addLead(e) {
     notes: "Added via phone",
     msg: draft(f.first.trim(), f.detail.trim())
   });
-  save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added!");
+  save(); render(); toggleAdd(false); e.target.reset(); toast("✓ Lead Added to To-Send list!");
 }
 
 renderReplies();
