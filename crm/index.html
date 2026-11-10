@@ -25,13 +25,16 @@
       <p class="text-[11px] text-slate-400">Auto-moves to "Sent" · Custom template editor built-in</p>
     </div>
     <div class="flex items-center gap-1.5">
-      <button onclick="toggleTemplate(true)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95 flex items-center gap-1" title="Edit message template across all leads">
+      <button onclick="confirmResetPipeline()" class="text-xs font-bold px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white active:scale-95 flex items-center gap-1" title="Reset all leads back to To Send">
+        <span>🔄</span> Reset
+      </button>
+      <button onclick="toggleTemplate(true)" class="text-xs font-bold px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 active:scale-95 flex items-center gap-1" title="Edit message template across all leads">
         <span>⚙️</span> Template
       </button>
-      <button onclick="toggleUpload(true)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
+      <button onclick="toggleUpload(true)" class="text-xs font-bold px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1">
         <span>📸</span> Scrape
       </button>
-      <button onclick="toggleAdd(true)" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FF5A4E] text-white active:scale-95">+ Add</button>
+      <button onclick="toggleAdd(true)" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#FF5A4E] text-white active:scale-95">+ Add</button>
     </div>
   </div>
 </header>
@@ -359,7 +362,7 @@
 <div id="toast" class="fixed bottom-6 inset-x-4 max-w-sm mx-auto px-4 py-3 rounded-xl font-bold text-sm text-center shadow-2xl opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
 <script>
-const STORE = "ew_crm_v11"; // Upgraded to v11 with Instant Phone/Email Search & Interactive Reply Logger
+const STORE = "ew_crm_v12"; // Upgraded to v12 with fresh clean pipeline & quick reset control
 const TEMPLATE_STORE = "ew_custom_template_v2";
 
 // Default template with personal introduction like Nash convo, portfolio & site ownership
@@ -434,11 +437,13 @@ const SEED = [
   msg: buildMsg(globalTemplate, l.first, l.detail, l.source)
 }));
 
-// Load leads and ensure replies array exists on every record
-let storedRaw = localStorage.getItem(STORE) || localStorage.getItem("ew_crm_v10") || localStorage.getItem("ew_crm_v9");
+// Fresh start for v12: all 26 leads load clean in "To Send"
+let storedRaw = localStorage.getItem(STORE);
 let stored = storedRaw ? JSON.parse(storedRaw) : null;
 let leads = (stored || SEED).map(l => ({
   ...l,
+  status: l.status || "TO_SEND",
+  sentAt: l.sentAt || null,
   replies: l.replies || [],
   msg: l.msg || buildMsg(globalTemplate, l.first, l.detail, l.source)
 }));
@@ -821,6 +826,30 @@ function deleteLeadFromProfile() {
   render();
   closeProfileModal();
   toast("✓ Lead deleted");
+}
+
+function confirmResetPipeline() {
+  if (confirm("Reset all 26 leads back to 'To Send' so you can start fresh?")) {
+    leads = SEED.map(l => ({
+      ...l,
+      status: "TO_SEND",
+      sentAt: null,
+      replies: [],
+      msg: buildMsg(globalTemplate, l.first, l.detail, l.source)
+    }));
+    save();
+    render();
+    toast("✓ All 26 leads reset to 'To Send'!");
+  }
+}
+
+function restorePreviousData() {
+  const prev = localStorage.getItem("ew_crm_v11") || localStorage.getItem("ew_crm_v10") || localStorage.getItem("ew_crm_v9");
+  if (!prev) { toast("No previous session found", true); return; }
+  leads = JSON.parse(prev);
+  save();
+  render();
+  toast("✓ Restored previous session leads!");
 }
 
 // Global Template Editor controls
